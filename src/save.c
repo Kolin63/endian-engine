@@ -41,7 +41,7 @@ int save_write(const char* dir, const char* file, const char* ext, const char* c
 }
 
 // predir should be "save" or "mods/modname/data/rom"
-int save_or_rom_read(const char* predir, const char* dir, const char* file, const char* ext, char* buf) {
+int save_or_rom_read(const char* predir, const char* dir, const char* file, const char* ext, char** out) {
   sds path = sdsnew(bot_get_global()->instance_dir);
   path = sdscat(path, "/");
   path = sdscat(path, predir);
@@ -68,22 +68,22 @@ int save_or_rom_read(const char* predir, const char* dir, const char* file, cons
     return 2;
   }
 
-  assert(buf == NULL);
-  buf = fileio_read_all(file_handle);
+  assert(*out == NULL);
+  *out = fileio_read_all(file_handle);
   fclose(file_handle);
   sdsfree(path);
   return 0;
 }
 
-int save_read(const char* dir, const char* file, const char* ext, char* buf) {
-  return save_or_rom_read("save", dir, file, ext, buf);
+int save_read(const char* dir, const char* file, const char* ext, char** out) {
+  return save_or_rom_read("save", dir, file, ext, out);
 }
 
-int rom_read(const char* mod, const char* dir, const char* file, const char* ext, char* buf) {
+int rom_read(const char* mod, const char* dir, const char* file, const char* ext, char** out) {
   sds predir = sdsnew("mods/");
   predir = sdscat(predir, mod);
   predir = sdscat(predir, "/data/rom");
-  int err = save_or_rom_read(predir, dir, file, ext, buf);
+  int err = save_or_rom_read(predir, dir, file, ext, out);
   sdsfree(predir);
   return err;
 }
