@@ -2,11 +2,11 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include "api.h"
 #include "bot.h"
 #include "cli_args.h"
-#include "log.h"
 #include "regman.h"
 #include "exit.h"
 
@@ -31,7 +31,7 @@ int main(int argc, const char** argv) {
   cli_args_cleanup();
   bot_cleanup();
 
-  log_info("Done");
+  printf("Done\n");
 
   return 0;
 }
