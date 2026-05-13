@@ -13,7 +13,6 @@
 #include "plugin.h"
 #include "registry.h"
 #include "regman.h"
-#include "sds.h"
 
 // returns amount of errors, 0 if ok
 int function_fillout(const char* namespace_name, const char* mod_name,
@@ -50,24 +49,36 @@ int function_fillout(const char* namespace_name, const char* mod_name,
       // mod:namespace
       char* fullname = jsmn_iterator_get_string_heap(json, iter.val);
       // split to mod and namespace
-      sds* tokens;
-      int count;
-      tokens = sdssplitlen(fullname, strlen(fullname), ":", 1, &count);
-      free(fullname);
-      if (count != 2) {
+
+      char* colon_pos = fullname;
+
+      while (*colon_pos != ':' && *colon_pos != '\0') colon_pos++;
+
+      if (*colon_pos != ':' || colon_pos == fullname) {
         log_error("Could not load plugin name in format mod:namespace from %s:%s:%s", mod_name, namespace_name, file_name);
-        sdsfreesplitres(tokens, count);
+        free(fullname);
         error++;
         continue;
       }
-      // copy strings
-      func->plugin_namespace = malloc(sdslen(tokens[0]) + 1);
-      strcpy(func->plugin_namespace, tokens[0]);
 
-      func->plugin_name = malloc(sdslen(tokens[1]) + 1);
-      strcpy(func->plugin_name, tokens[1]);
+      // ccc:ccccc
+      // len 9
+      // colon 3
+      // ns len 3-0+1=4
+      // name len 5+1=6
 
-      sdsfreesplitres(tokens, count);
+      // set colon to null term to make two strings
+      *colon_pos = '\0';
+      const char* plugin_namespace = fullname;
+      const char* plugin_name = colon_pos + 1;
+
+      func->plugin_namespace = malloc(colon_pos - fullname + 1);
+      strcpy(func->plugin_namespace, plugin_namespace);
+
+      func->plugin_name = malloc(strlen(plugin_name) + 1);
+      strcpy(func->plugin_name, plugin_name);
+
+      free(fullname);
     } else {
       log_error("Function %s:%s:%s has unknown object %s", namespace_name, mod_name, file_name, iter.key);
       error++;
