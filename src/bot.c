@@ -24,9 +24,6 @@ static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_mutex_t on_ready_lock = PTHREAD_MUTEX_INITIALIZER;
 
-// forward declaration
-void set_cleanup_ready();
-
 void log_lock_func(bool lock, void* udata) {
   if (lock == true) {
     pthread_mutex_lock(&log_lock);

@@ -13,9 +13,6 @@
 #include "command.h"
 #include "plugin.h"
 
-// forward declaration. defined in main.c
-void handle_exit();
-
 static struct api* global;
 
 void api_init() {
