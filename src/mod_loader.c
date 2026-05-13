@@ -38,20 +38,16 @@
     sdsfree(fullpath);                                                          \
   }
 
-void data_load(const struct discord_ready* event, const char* data_path, const char* mod_name) {
-  DIRECTORY_LOAD(data_path, "functions", function_load(file_path, mod_name, file_name));
-  DIRECTORY_LOAD(data_path, "commands", command_load(event, file_path, mod_name, file_name));
+void namespace_load(const struct discord_ready* event, const char* namespace_path, const char* namespace_name, const char* mod_name) {
+  DIRECTORY_LOAD(namespace_path, "plugins", plugin_load(file_path, namespace_name, mod_name, file_name));
+  DIRECTORY_LOAD(namespace_path, "functions", function_load(file_path, namespace_name, mod_name, file_name));
+  DIRECTORY_LOAD(namespace_path, "commands", command_load(event, file_path, mod_name, file_name));
 }
 
 void mod_load(const struct discord_ready* event, const char* mod_path, const char* mod_name) {
   log_info("Loading mod %s", mod_name);
 
-  DIRECTORY_LOAD(mod_path, "plugins", plugin_load(file_path, mod_name, file_name));
-
-  sds data_path = sdsnew(mod_path);
-  data_path = sdscat(data_path, "/data");
-  data_load(event, data_path, mod_name);
-  sdsfree(data_path);
+  DIRECTORY_LOAD(mod_path, "data", namespace_load(event, file_path, file_name, mod_name));
 }
 
 void mod_loader_load_mods(const struct discord_ready* event) {

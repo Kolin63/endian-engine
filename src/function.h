@@ -15,13 +15,15 @@ enum function_type {
 struct function {
   enum function_type type;
   const void (*function)(...);
+  char* namespace;
   char* name;
+  char* plugin_namespace;
   char* plugin_name;
 };
 
 #ifdef ENDIAN_ENGINE
 
-void function_load(const char* function_path, const char* mod_name, const char* file_name);
+void function_load(const char* function_path, const char* namespace_name, const char* mod_name, const char* file_name);
 const struct function* function_get(char* name);
 
 int function_cmp(const struct function* a, const struct function* b);

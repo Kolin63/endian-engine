@@ -115,8 +115,8 @@ struct api {
 
   // const struct registry* get_plugin_registry();
   const struct registry* (*get_plugin_registry)();
-  // const struct plugin* plugin_get(char* name);
-  const struct plugin* (*plugin_get)(char* name);
+  // const struct plugin* plugin_get(char* namespace, char* name);
+  const struct plugin* (*plugin_get)(char* namespace, char* name);
   // const struct registry* get_function_registry();
   const struct registry* (*get_function_registry)();
   // const struct function* function_get(char* name);

@@ -377,7 +377,7 @@ void command_load(const struct discord_ready* event, const char* command_path,
   FILE* file = fopen(command_path, "r");
 
   if (!file) {
-    log_error("Could not open command file from %s at %s", mod_name, command_path);
+    log_error("Could not open command file from mod %s at %s", mod_name, command_path);
     return;
   }
 

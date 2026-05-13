@@ -13,11 +13,12 @@
 #include "plugin.h"
 #include "registry.h"
 #include "regman.h"
+#include "sds.h"
 
 // returns amount of errors, 0 if ok
-int function_fillout(const char* mod_name, const char* file_name,
-                     const jsmntok_t* jsmn, const char* json,
-                     struct function* func) {
+int function_fillout(const char* namespace_name, const char* mod_name,
+                     const char* file_name, const jsmntok_t* jsmn,
+                     const char* json, struct function* func) {
   int error = 0;
 
   struct jsmn_iterator iter;
@@ -37,7 +38,7 @@ int function_fillout(const char* mod_name, const char* file_name,
       else if (strcmp(val, "EXPORT") == 0) func->type = FT_EXPORT;
       else if (strcmp(val, "CLEANUP") == 0) func->type = FT_CLEANUP;
       else {
-        log_error("In function %s from mod %s, unknown type %s", file_name, mod_name, val);
+        log_error("In function %s:%s:%s, unknown type %s", namespace_name, mod_name, file_name, val);
         error++;
         continue;
       }
@@ -46,9 +47,29 @@ int function_fillout(const char* mod_name, const char* file_name,
       func->name = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "plugin") == 0) {
       END_JSON_CHECK_STRING(iter);
-      func->plugin_name = jsmn_iterator_get_string_heap(json, iter.val);
+      // mod:namespace
+      char* fullname = jsmn_iterator_get_string_heap(json, iter.val);
+      // split to mod and namespace
+      sds* tokens;
+      int count;
+      tokens = sdssplitlen(fullname, strlen(fullname), ":", 1, &count);
+      free(fullname);
+      if (count != 2) {
+        log_error("Could not load plugin name in format mod:namespace from %s:%s:%s", mod_name, namespace_name, file_name);
+        sdsfreesplitres(tokens, count);
+        error++;
+        continue;
+      }
+      // copy strings
+      func->plugin_namespace = malloc(sdslen(tokens[0]) + 1);
+      strcpy(func->plugin_namespace, tokens[0]);
+
+      func->plugin_name = malloc(sdslen(tokens[1]) + 1);
+      strcpy(func->plugin_name, tokens[1]);
+
+      sdsfreesplitres(tokens, count);
     } else {
-      log_error("Function %s from mod %s has unknown object %s", file_name, mod_name, iter.key);
+      log_error("Function %s:%s:%s has unknown object %s", namespace_name, mod_name, file_name, iter.key);
       error++;
       continue;
     }
@@ -57,12 +78,12 @@ int function_fillout(const char* mod_name, const char* file_name,
   return error;
 }
 
-void function_load(const char* function_path, const char* mod_name, const char* file_name) {
+void function_load(const char* function_path, const char* namespace_name, const char* mod_name, const char* file_name) {
   if (strcmp(file_name, "template.json") == 0) return;
 
   FILE* file = fopen(function_path, "r");
   if (file == NULL) {
-    log_error("Could not open %s at %s", file_name, function_path);
+    log_error("Could not open %s at %s from %s:%s", file_name, function_path, namespace_name, mod_name);
     return;
   }
   char* json = fileio_read_all(file);
@@ -71,7 +92,7 @@ void function_load(const char* function_path, const char* mod_name, const char* 
   jsmntok_t* jsmn = fileio_read_json(json);
 
   struct function func = {};
-  if (function_fillout(mod_name, file_name, jsmn, json, &func) != 0) {
+  if (function_fillout(namespace_name, mod_name, file_name, jsmn, json, &func) != 0) {
     free(json);
     free(jsmn);
     return;
@@ -80,10 +101,10 @@ void function_load(const char* function_path, const char* mod_name, const char* 
   free(json);
   free(jsmn);
 
-  const struct plugin* plugin = plugin_get(func.plugin_name);
+  const struct plugin* plugin = plugin_get(func.plugin_namespace, func.plugin_name);
   if (plugin == NULL) {
-    log_error("Could not find plugin %s while loading function %s from mod %s",
-              func.plugin_name, func.name, mod_name);
+    log_error("Could not find plugin %s:%s while loading function %s:%s:%s",
+              func.plugin_namespace, func.plugin_name, namespace_name, mod_name, func.name);
     return;
   }
 
@@ -92,20 +113,19 @@ void function_load(const char* function_path, const char* mod_name, const char* 
 
   const char* error = dlerror();
   if (error != NULL) {
-    log_error("Error loading function %s from plugin %s from mod %s: %s",
-              func.name, func.plugin_name, mod_name, error);
+    log_error("Error loading function %s:%s:%s (%s)",
+              namespace_name, mod_name, func.name, error);
     return;
   }
 
   func.function = handle;
 
   if (registry_add(regman_get_function(), &func) == NULL) {
-    log_error("Function %s already registered", func.name);
+    log_error("Function %s:%s:%s already registered", namespace_name, mod_name, func.name);
     return;
   }
 
-  log_info("Loading function %s from plugin %s from mod %s", func.name,
-           func.plugin_name, mod_name);
+  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.name, func.plugin_namespace, func.plugin_name);
 }
 
 const struct function* function_get(char* name) {
