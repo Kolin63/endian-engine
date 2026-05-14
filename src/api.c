@@ -57,7 +57,6 @@ void api_init() {
 
   global->save_write = save_write;
   global->save_read = save_read;
-  global->rom_read = rom_read;
 }
 
 void api_cleanup() { free(global); }

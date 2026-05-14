@@ -78,12 +78,3 @@ int save_or_rom_read(const char* predir, const char* dir, const char* file, cons
 int save_read(const char* dir, const char* file, const char* ext, char** out) {
   return save_or_rom_read("save", dir, file, ext, out);
 }
-
-int rom_read(const char* mod, const char* dir, const char* file, const char* ext, char** out) {
-  sds predir = sdsnew("mods/");
-  predir = sdscat(predir, mod);
-  predir = sdscat(predir, "/data/rom");
-  int err = save_or_rom_read(predir, dir, file, ext, out);
-  sdsfree(predir);
-  return err;
-}
