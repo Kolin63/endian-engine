@@ -7,6 +7,7 @@
 #include "command.h"
 #include "function.h"
 #include "log.h"
+#include "namespace.h"
 #include "plugin.h"
 #include "sds.h"
 
@@ -39,6 +40,7 @@
   }
 
 void mod_loader_namespace_load(const struct discord_ready* event, const char* namespace_path, const char* namespace_name, const char* mod_name) {
+  namespace_load(mod_name, namespace_name);
   DIRECTORY_LOAD(namespace_path, "plugins", plugin_load(file_path, namespace_name, mod_name, file_name));
   DIRECTORY_LOAD(namespace_path, "functions", function_load(file_path, namespace_name, mod_name, file_name));
   DIRECTORY_LOAD(namespace_path, "commands", command_load(event, file_path, mod_name, file_name));

@@ -12,6 +12,7 @@
 #include "user.h"
 #include "command.h"
 #include "plugin.h"
+#include "namespace.h"
 
 static struct api* global;
 
@@ -37,6 +38,9 @@ void api_init() {
   global->registry_ktov = registry_ktov;
   global->registry_strcmp = registry_strcmp;
 
+  global->get_namespace_registry = (void*)regman_get_namespace;
+  global->namespace_get = namespace_get;
+  global->namespace_mod_entry_get = namespace_mod_entry_get;
   global->get_plugin_registry = (void*)regman_get_plugin;
   global->plugin_get = plugin_get;
   global->get_function_registry = (void*)regman_get_function;

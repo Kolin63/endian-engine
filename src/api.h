@@ -118,6 +118,12 @@ struct api {
   // int registry_strcmp(const char* a, const char* b);
   int (*registry_strcmp)(const char* a, const char* b);
 
+  // const struct registry* get_namespace_registry();
+  const struct registry* (*get_namespace_registry)();
+  // const struct namespace* namespace_get(const char* name);
+  const struct namespace* (*namespace_get)(const char* name);
+  // const struct namespace_mod_entry* namespace_mod_entry_get(const struct namespace* ns, const char* name);
+  const struct namespace_mod_entry* (*namespace_mod_entry_get)(const struct namespace* ns, const char* name);
   // const struct registry* get_plugin_registry();
   const struct registry* (*get_plugin_registry)();
   // const struct plugin* plugin_get(char* namespace, char* name);

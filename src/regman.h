@@ -4,6 +4,7 @@
 #include "registry.h"
 
 struct regman {
+  struct registry* namespace;
   struct registry* plugin;
   struct registry* function;
   struct registry* command;
@@ -15,6 +16,7 @@ void regman_cleanup();
 
 struct regman* regman_get();
 
+struct registry* regman_get_namespace();
 struct registry* regman_get_plugin();
 struct registry* regman_get_function();
 struct registry* regman_get_command();

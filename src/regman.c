@@ -6,6 +6,7 @@
 
 #include "command.h"
 #include "function.h"
+#include "namespace.h"
 #include "user.h"
 #include "plugin.h"
 #include "registry.h"
@@ -15,6 +16,7 @@ struct regman* global;
 void regman_init() {
   global = malloc(sizeof(struct regman));
 
+  global->namespace = registry_init(sizeof(struct namespace), (void*)namespace_cmp, (void*)namespace_cleanup);
   global->plugin = registry_init(sizeof(struct plugin), (void*)plugin_cmp, (void*)plugin_cleanup);
   global->function = registry_init(sizeof(struct function), (void*)function_cmp, (void*)function_cleanup);
   global->command = registry_init(sizeof(struct command), (void*)command_cmp, (void*)command_cleanup);
@@ -22,6 +24,7 @@ void regman_init() {
 }
 
 void regman_cleanup() {
+  registry_cleanup(global->namespace);
   registry_cleanup(global->plugin);
   registry_cleanup(global->function);
   registry_cleanup(global->command);
@@ -31,6 +34,7 @@ void regman_cleanup() {
 
 struct regman* regman_get() { return global; }
 
+struct registry* regman_get_namespace() { return global->namespace; }
 struct registry* regman_get_plugin() { return global->plugin; }
 struct registry* regman_get_function() { return global->function; }
 struct registry* regman_get_command() { return global->command; }
