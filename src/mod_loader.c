@@ -38,16 +38,16 @@
     sdsfree(fullpath);                                                          \
   }
 
-void namespace_load(const struct discord_ready* event, const char* namespace_path, const char* namespace_name, const char* mod_name) {
+void mod_loader_namespace_load(const struct discord_ready* event, const char* namespace_path, const char* namespace_name, const char* mod_name) {
   DIRECTORY_LOAD(namespace_path, "plugins", plugin_load(file_path, namespace_name, mod_name, file_name));
   DIRECTORY_LOAD(namespace_path, "functions", function_load(file_path, namespace_name, mod_name, file_name));
   DIRECTORY_LOAD(namespace_path, "commands", command_load(event, file_path, mod_name, file_name));
 }
 
-void mod_load(const struct discord_ready* event, const char* mod_path, const char* mod_name) {
+void mod_loader_mod_load(const struct discord_ready* event, const char* mod_path, const char* mod_name) {
   log_info("Loading mod %s", mod_name);
 
-  DIRECTORY_LOAD(mod_path, "data", namespace_load(event, file_path, file_name, mod_name));
+  DIRECTORY_LOAD(mod_path, "data", mod_loader_namespace_load(event, file_path, file_name, mod_name));
 }
 
 void mod_loader_load_mods(const struct discord_ready* event) {
@@ -60,7 +60,7 @@ void mod_loader_load_mods(const struct discord_ready* event) {
   // this is for logging within the macro
   const char* mod_name = "ENDIAN_ENGINE";
 
-  DIRECTORY_LOAD(instance_dir, "mods", mod_load(event, file_path, file_name));
+  DIRECTORY_LOAD(instance_dir, "mods", mod_loader_mod_load(event, file_path, file_name));
 
   sdsfree(mods_path);
 }
