@@ -15,7 +15,6 @@ enum function_type {
 struct function {
   enum function_type type;
   const void (*function)(...);
-  char* namespace;
   char* name;
   char* plugin_namespace;
   char* plugin_name;
