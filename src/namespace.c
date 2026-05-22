@@ -14,7 +14,8 @@ void namespace_load(const char* mod_name, const char* namespace_name) {
     struct namespace ns_new;
     ns_new.name = malloc(strlen(namespace_name) + 1);
     strcpy(ns_new.name, namespace_name);
-    ns_new.mods = registry_init(sizeof(struct namespace_mod_entry), (void*)namespace_mod_entry_cmp, (void*)namespace_mod_entry_cleanup);
+    ns_new.mods = malloc(sizeof(struct registry));
+    registry_init(ns_new.mods, sizeof(struct namespace_mod_entry), (void*)namespace_mod_entry_cmp, (void*)namespace_mod_entry_cleanup);
 
     struct namespace_mod_entry modent;
     modent.name = malloc(strlen(mod_name) + 1);
@@ -55,6 +56,7 @@ int namespace_cmp(const struct namespace* a, const struct namespace* b) {
 void namespace_cleanup(struct namespace* elem) {
   free(elem->name);
   registry_cleanup(elem->mods);
+  free(elem->mods);
 }
 
 const struct namespace_mod_entry* namespace_mod_entry_get(const struct namespace* ns, const char* name) {

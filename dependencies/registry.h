@@ -33,8 +33,8 @@
 #define COLIN_REGISTRY_VERSION_MINOR 0
 #define COLIN_REGISTRY_VERSION_PATCH 0
 
-// an interface to a single registry. none of these fields should be manually
-// written to.
+// an interface to a single registry. intialized with registry_init(). none of
+// these fields should be manually written to.
 struct registry {
   // amount of keys / values
   int length;
@@ -59,11 +59,11 @@ struct registry {
   void* vals;
 };
 
-// puts a new registry on the heap. registry_cleanup() must be called when it
-// is done being used
-struct registry* registry_init(int val_size,
-                               int (*cmp)(const void*, const void*),
-                               void (*cleanup)(void* elem));
+// initializes a registry. registry_cleanup() must be called when it is done
+// being used
+void registry_init(struct registry* reg, int val_size,
+                   int (*cmp)(const void*, const void*),
+                   void (*cleanup)(void* elem));
 
 // frees allocated memory for a registry. if the registry contains structs with
 // data on the heap, those fields must be freed before calling this function
