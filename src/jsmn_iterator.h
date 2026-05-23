@@ -52,6 +52,8 @@ struct jsmn_iterator {
   const char* json;
 };
 
+#ifdef ENDIAN_ENGINE
+
 // gets the string value of a JSMN token and puts it in a string buffer. size is
 // the length of the buffer, including the null terminator. json is the string
 // of the json content, and the same string that is passed to jsmn_parse()
@@ -78,5 +80,7 @@ void jsmn_iterator_init(struct jsmn_iterator* iter, const jsmntok_t* root, const
 
 // iterates to next value. returns 1 if iteration can continue, and 0 if not
 int jsmn_iterator_next(struct jsmn_iterator* iter);
+
+#endif
 
 #endif

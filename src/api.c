@@ -49,6 +49,12 @@ void api_init() {
   global->get_command_registry = (void*)regman_get_command;
   global->command_get = command_get;
 
+  global->jsmn_iterator_get_string = jsmn_iterator_get_string;
+  global->jsmn_iterator_get_string_heap = jsmn_iterator_get_string_heap;
+  global->jsmn_iterator_type_to_str = jsmn_iterator_type_to_str;
+  global->jsmn_iterator_init = jsmn_iterator_init;
+  global->jsmn_iterator_next = jsmn_iterator_next;
+
   global->fileio_read_all = fileio_read_all;
   global->fileio_read_json = fileio_read_json;
 
