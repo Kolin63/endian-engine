@@ -35,6 +35,10 @@ struct api {
   //
   // void handle_exit();
   void (*handle_exit)();
+  // server saves all data and tells mods to save all data
+  //
+  // void handle_save();
+  void (*handle_save)();
   // premature cleanup before everything is initialized, for example to abort
   // the program during the cli args initialization phase
   //
@@ -239,6 +243,8 @@ void api_call_get_api();
 void api_call_init();
 // calls all mod functions of type LOAD
 void api_call_load();
+// calls all mod functions of type SAVE
+void api_call_save();
 // calls all mod functions of type CLEANUP
 void api_call_cleanup();
 

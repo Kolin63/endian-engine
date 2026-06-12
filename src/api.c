@@ -25,6 +25,7 @@ void api_init() {
   global->log_log = log_log;
 
   global->handle_exit = handle_exit;
+  global->handle_save = api_call_save;
   global->abort_cleanup = abort_cleanup;
   global->get_cleanup_ready = get_cleanup_ready;
 
@@ -90,5 +91,7 @@ void api_call_get_api() { api_call_func_type(FT_GET_API); }
 void api_call_init() { api_call_func_type(FT_INIT); }
 
 void api_call_load() { api_call_func_type(FT_LOAD); }
+
+void api_call_save() { api_call_func_type(FT_SAVE); }
 
 void api_call_cleanup() { api_call_func_type(FT_CLEANUP); }

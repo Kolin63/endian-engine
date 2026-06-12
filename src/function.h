@@ -12,6 +12,7 @@ enum function_type {
   FT_EXPORT,
   FT_TO_JSON,
   FT_DATA,
+  FT_SAVE,
   FT_CLEANUP,
 };
 
