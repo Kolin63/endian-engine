@@ -8,7 +8,9 @@ enum function_type {
   FT_GET_API,
   FT_INIT,
   FT_LOAD,
+  FT_FILLOUT,
   FT_EXPORT,
+  FT_DATA,
   FT_CLEANUP,
 };
 
