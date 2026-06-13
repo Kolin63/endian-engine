@@ -111,6 +111,41 @@ void* registry_add(struct registry* reg, const void* val) {
   return registry_itov(reg, insert_index);
 }
 
+int registry_del(struct registry* reg, int i, void* val) {
+  int next_len = reg->length - i - 1;
+  if (next_len > 0) {
+    const void* next = registry_itov(reg, i + 1);
+    memmove(val, next, next_len * reg->val_size);
+  }
+
+  reg->length--;
+  if (reg->length == 0) {
+    free(reg->vals);
+    reg->vals = NULL;
+  } else {
+    reg->vals = realloc(reg->vals, reg->length * reg->val_size);
+  }
+
+  return 0;
+}
+
+int registry_del_val(struct registry* reg, void* val) {
+  int i = registry_vtoi(reg, val);
+  return registry_del(reg, i, val);
+}
+
+int registry_del_key(struct registry* reg, const void* key) {
+  int i = registry_ktoi(reg, key);
+  if (i == -1) return -1;
+  void* val = registry_itov(reg, i);
+  return registry_del(reg, i, val);
+}
+
+int registry_del_i(struct registry* reg, int i) {
+  void* val = registry_itov(reg, i);
+  return registry_del(reg, i, val);
+}
+
 void registry_clear(struct registry* reg) {
   registry_value_cleanup(reg);
   reg->vals = NULL;
@@ -150,6 +185,10 @@ void* registry_ktov(const struct registry* reg, const void* key) {
   int i = registry_ktoi(reg, key);
   if (i < 0) return NULL;
   return registry_itov(reg, i);
+}
+
+int registry_vtoi(const struct registry* reg, const void* val) {
+  return (val - reg->vals) / reg->val_size;
 }
 
 int registry_strcmp(const char* a, const char* b) {

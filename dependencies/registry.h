@@ -77,6 +77,15 @@ int registry_safe_cmp(const struct registry* reg, const void* a, const void* b);
 // exists
 void* registry_add(struct registry* reg, const void* val);
 
+// removes entry from registry by value pointer. returns 0 if ok
+int registry_del_val(struct registry* reg, void* val);
+
+// removes entry from registry that matches key. returns 0 if ok
+int registry_del_key(struct registry* reg, const void* key);
+
+// removes entry from registry by index. returns 0 if ok
+int registry_del_i(struct registry* reg, int i);
+
 // removes all entries from registry. does not call registry_cleanup(). does not
 // need to be called before calling registry_cleanup()
 void registry_clear(struct registry* reg);
@@ -92,6 +101,9 @@ int registry_ktoi(const struct registry* reg, const void* key);
 
 // key to value. returns NULL if the key doesn't exist
 void* registry_ktov(const struct registry* reg, const void* key);
+
+// value to index
+int registry_vtoi(const struct registry* reg, const void* val);
 
 // fast implementation of strcmp. only return values are 1, 0, or -1
 int registry_strcmp(const char* a, const char* b);

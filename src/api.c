@@ -34,10 +34,14 @@ void api_init() {
   global->registry_init = registry_init;
   global->registry_cleanup = registry_cleanup;
   global->registry_add = registry_add;
+  global->registry_del_val = registry_del_val;
+  global->registry_del_key = registry_del_key;
+  global->registry_del_i = registry_del_i;
   global->registry_itov = registry_itov;
   global->registry_itov_safe = registry_itov_safe;
   global->registry_ktoi = registry_ktoi;
   global->registry_ktov = registry_ktov;
+  global->registry_vtoi = registry_vtoi;
   global->registry_strcmp = registry_strcmp;
 
   global->get_namespace_registry = (void*)regman_get_namespace;
