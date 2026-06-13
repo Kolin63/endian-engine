@@ -10,14 +10,27 @@
 #include "fileio.h"
 #include "log.h"
 
-int save_write(const char* dir, const char* file, const char* ext, const char* content) {
-  char* path = malloc(strlen(bot_get_global()->instance_dir) + 6 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
+int save_write(const char* ns, const char* dir, const char* file,
+               const char* ext, const char* content) {
+  char* path = malloc(strlen(bot_get_global()->instance_dir) + 6 + strlen(ns) +
+                      1 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
   strcpy(path, bot_get_global()->instance_dir);
   strcat(path, "/save/");
+  strcat(path, ns);
+
+  // check that the namespace directory exists
+  FILE* dir_check = fopen(path, "r");
+  if (dir_check == NULL) {
+    mkdir(path, 0b111111111);
+  } else {
+    fclose(dir_check);
+  }
+
+  strcat(path, "/");
   strcat(path, dir);
 
-  // check that the directory exists
-  FILE* dir_check = fopen(path, "r");
+  // check that the namespace/dir directory exists
+  dir_check = fopen(path, "r");
   if (dir_check == NULL) {
     mkdir(path, 0b111111111);
   } else {
@@ -43,16 +56,30 @@ int save_write(const char* dir, const char* file, const char* ext, const char* c
 }
 
 // predir should be "save" or "mods/modname/data/rom"
-int save_or_rom_read(const char* predir, const char* dir, const char* file, const char* ext, char** out) {
-  char* path = malloc(strlen(bot_get_global()->instance_dir) + 1 + strlen(predir) + 1 + strlen(dir) + 1);
+int save_or_rom_read(const char* predir, const char* ns, const char* dir,
+                     const char* file, const char* ext, char** out) {
+  char* path = malloc(strlen(bot_get_global()->instance_dir) + 1 +
+                      strlen(predir) + 1 + strlen(ns) + 1 + strlen(dir) + 1 +
+                      strlen(file) + 1 + strlen(ext) + 1);
   strcpy(path, bot_get_global()->instance_dir);
   strcat(path, "/");
   strcat(path, predir);
   strcat(path, "/");
+  strcat(path, ns);
+
+  // check that the namespace directory exists
+  FILE* dir_check = fopen(path, "r");
+  if (dir_check == NULL) {
+    log_error("Directory %s does not exist", path);
+    return 1;
+  }
+  fclose(dir_check);
+
+  strcat(path, "/");
   strcat(path, dir);
 
-  // check that the directory exists
-  FILE* dir_check = fopen(path, "r");
+  // check that the namespace/dir directory exists
+  fopen(path, "r");
   if (dir_check == NULL) {
     log_error("Directory %s does not exist", path);
     return 1;
@@ -78,6 +105,7 @@ int save_or_rom_read(const char* predir, const char* dir, const char* file, cons
   return 0;
 }
 
-int save_read(const char* dir, const char* file, const char* ext, char** out) {
-  return save_or_rom_read("save", dir, file, ext, out);
+int save_read(const char* ns, const char* dir, const char* file,
+              const char* ext, char** out) {
+  return save_or_rom_read("save", ns, dir, file, ext, out);
 }

@@ -214,20 +214,22 @@ struct api {
   unsigned long (*string_to_uuid)(const char* str);
 
   // writes to save file. returns 0 if ok.
+  // ns is namespace
   // dir does not need a trailing slash
   // ext is file extension, and it should not include the dot. for example, a
   // json file has the extension "json", not ".json"
   //
-  // int save_write(const char* dir, const char* file, const char* ext, const char* content);
-  int (*save_write)(const char* dir, const char* file, const char* ext, const char* content);
+  // int save_write(const char* ns, const char* dir, const char* file, const char* ext, const char* content);
+  int (*save_write)(const char* ns, const char* dir, const char* file, const char* ext, const char* content);
 
   // reads from save file into out. returns 0 if ok
+  // ns is namespace
   // dir does not need a trailing slash
   // ext is file extension, and it should not include the dot. for example, a
   // json file has the extension "json", not ".json"
   //
-  // int save_read(const char* dir, const char* file, const char* ext, char** out);
-  int (*save_read)(const char* dir, const char* file, const char* ext, char** out);
+  // int save_read(const char* ns, const char* dir, const char* file, const char* ext, char** out);
+  int (*save_read)(const char* ns, const char* dir, const char* file, const char* ext, char** out);
 };
 
 #ifdef ENDIAN_ENGINE
