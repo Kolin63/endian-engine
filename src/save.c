@@ -45,7 +45,7 @@ int save_write(const char* ns, const char* dir, const char* file,
   // check that the file exists
   FILE* file_handle = fopen(path, "w");
   if (file_handle == NULL) {
-    log_error("Could not open file %s for writing", path);
+    log_error("Could not open file %s for writing. Tried to write: %s", path, content);
     return 2;
   }
 
