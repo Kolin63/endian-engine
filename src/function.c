@@ -23,7 +23,7 @@ int function_fillout(const char* namespace_name, const char* mod_name,
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, return error);
+  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "type") == 0) {

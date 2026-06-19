@@ -67,7 +67,7 @@ int command_option_choices_fillout(const char* mod_name, const char* file_name,
   struct jsmn_iterator arr_iter = {};
   jsmn_iterator_init(&arr_iter, jsmn, json);
 
-  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(arr_iter, return error);
+  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(arr_iter, error++; return error);
 
   /* a choice is like this:
      {
@@ -132,7 +132,7 @@ int command_option_channel_types_fillout(const char* mod_name,
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(iter, return error);
+  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
     END_JSON_CHECK_STRING(iter);
@@ -186,7 +186,7 @@ int command_option_fillout(const char* mod_name, const char* file_name,
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, return error);
+  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "type") == 0) {
@@ -273,7 +273,7 @@ int command_options_fillout(const char* mod_name, const char* file_name,
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(iter, return error);
+  END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
     if (iter.val->type != JSMN_OBJECT) {
@@ -309,7 +309,7 @@ int command_fillout(const char* mod_name, const char* file_name,
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, return error);
+  END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "type") == 0) {
