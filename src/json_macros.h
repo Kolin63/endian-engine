@@ -37,6 +37,42 @@
 // - int error
 #define END_JSON_CHECK_BOOL(_iter) END_JSON_CHECK_BOOL_RET(_iter, continue);
 
+// checks that a null value is the proper type. custom return
+// params:
+// - const jsmn_iterator _iter
+// assumes the following variables exist:
+// - struct json_iterator* iter
+// - const char* json
+// - const char* file_name
+// - const char* mod_name
+// - int error
+#define END_JSON_CHECK_NULL_RET(_iter, _ret)                                                            \
+  if (_iter.val->type != JSMN_PRIMITIVE) {                                                              \
+    log_error("In data type %s from mod %s, %s must be null (type)", file_name, mod_name, _iter.key);   \
+    error++;                                                                                            \
+    _ret;                                                                                               \
+  }                                                                                                     \
+  {                                                                                                     \
+    char val[2];                                                                                        \
+    jsmn_iterator_get_string(val, 2, json, _iter.val);                                                  \
+    if (val[0] != 'n') {                                                                                \
+      log_error("In data type %s from mod %s, %s must be null (char)", file_name, mod_name, _iter.key); \
+      error++;                                                                                          \
+      _ret;                                                                                             \
+    }                                                                                                   \
+  }
+
+// checks that a null value is the proper type.
+// params:
+// - const jsmn_iterator _iter
+// assumes the following variables exist:
+// - struct json_iterator* iter
+// - const char* json
+// - const char* file_name
+// - const char* mod_name
+// - int error
+#define END_JSON_CHECK_NULL(_iter) END_JSON_CHECK_NULL_RET(_iter, continue);
+
 // checks that a number is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
