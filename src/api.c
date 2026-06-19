@@ -21,6 +21,7 @@ void api_init() {
   global = malloc(sizeof(struct api));
 
   global->version = API_VERSION;
+  global->get_version = api_get_version;
 
   global->log_log = log_log;
 
@@ -79,6 +80,8 @@ void api_init() {
 void api_cleanup() { free(global); }
 
 const struct api* api_get_global() { return global; }
+
+int api_get_version() { return API_VERSION; }
 
 void api_call_func_type(enum function_type type) {
   const struct registry* func_reg = regman_get_function();

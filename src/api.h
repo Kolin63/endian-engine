@@ -28,6 +28,9 @@ struct registry;
 struct api {
   int version;
 
+  // int get_version();
+  int (*get_version)();
+
   // void log_log(int level, const char* file, int line, const char* fmt, ...);
   void (*log_log)(int level, const char* file, int line, const char* fmt, ...);
 
@@ -258,6 +261,8 @@ void api_init();
 void api_cleanup();
 
 const struct api* api_get_global();
+
+int api_get_version();
 
 // calls all mod functions of type GET_API
 void api_call_get_api();
