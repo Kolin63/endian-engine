@@ -78,7 +78,7 @@ void on_interaction(struct discord* client, const struct discord_interaction* ev
   }
 
   if (func->type != FT_CALLBACK) {
-    log_error("In command %s, function %s is not of type CALLBACK", cmd_name, func->name);
+    log_error("In command %s, function %s:%s is not of type CALLBACK", cmd_name, func->fid.ns, func->fid.id);
     // TODO: send warning message to user via discord
     return;
   }

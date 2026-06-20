@@ -21,14 +21,14 @@ enum function_type {
 struct function {
   enum function_type type;
   const void (*function)(...);
-  char* name;
+  struct fid fid;
   const struct fid* plugin_fid;
 };
 
 #ifdef ENDIAN_ENGINE
 
 void function_load(const char* function_path, const char* namespace_name, const char* mod_name, const char* file_name);
-const struct function* function_get(char* name);
+const struct function* function_get(const struct fid* fid);
 
 int function_cmp(const struct function* a, const struct function* b);
 

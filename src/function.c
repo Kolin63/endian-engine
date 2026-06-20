@@ -11,6 +11,7 @@
 #include "jsmn_iterator.h"
 #include "json_macros.h"
 #include "log.h"
+#include "namespace.h"
 #include "plugin.h"
 #include "registry.h"
 #include "regman.h"
@@ -20,6 +21,8 @@ int function_fillout(const char* namespace_name, const char* mod_name,
                      const char* file_name, const jsmntok_t* jsmn,
                      const char* json, struct function* func) {
   int error = 0;
+
+  func->fid.ns = namespace_get(namespace_name)->name;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
@@ -48,7 +51,7 @@ int function_fillout(const char* namespace_name, const char* mod_name,
       }
     } else if (strcmp(iter.key, "name") == 0) {
       END_JSON_CHECK_STRING(iter);
-      func->name = jsmn_iterator_get_string_heap(json, iter.val);
+      func->fid.id = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "plugin") == 0) {
       END_JSON_CHECK_STRING(iter);
       // namespace:plugin
@@ -103,38 +106,40 @@ void function_load(const char* function_path, const char* namespace_name, const 
   const struct plugin* plugin = plugin_get(func.plugin_fid);
   if (plugin == NULL) {
     log_error("Could not find plugin %s:%s while loading function %s:%s:%s",
-              func.plugin_fid->ns, func.plugin_fid->id, namespace_name, mod_name, func.name);
+              func.plugin_fid->ns, func.plugin_fid->id, namespace_name, mod_name, file_name);
     return;
   }
 
   dlerror();  // clear error
-  void* handle = dlsym(plugin->plugin, func.name);
+  void* handle = dlsym(plugin->plugin, func.fid.id);
 
   const char* error = dlerror();
   if (error != NULL) {
     log_error("Error loading function %s:%s:%s (%s)",
-              namespace_name, mod_name, func.name, error);
+              namespace_name, mod_name, func.fid.id, error);
     return;
   }
 
   func.function = handle;
 
   if (registry_add(regman_get_function(), &func) == NULL) {
-    log_error("Function %s:%s:%s already registered", namespace_name, mod_name, func.name);
+    log_error("Function %s:%s:%s already registered", namespace_name, mod_name, func.fid.id);
     return;
   }
 
-  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.name, func.plugin_fid->ns, func.plugin_fid->id);
+  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.fid.id, func.plugin_fid->ns, func.plugin_fid->id);
 }
 
-const struct function* function_get(char* name) {
-  return registry_ktov(regman_get_function(), &(struct function){.name = name});
+const struct function* function_get(const struct fid* fid) {
+  return registry_ktov(regman_get_function(), &(struct function){.fid = *fid});
 }
 
 int function_cmp(const struct function* a, const struct function* b) {
-  return registry_strcmp(a->name, b->name);
+  int ns = registry_strcmp(a->fid.ns, b->fid.ns);
+  if (ns != 0) return ns;
+  return registry_strcmp(a->fid.id, b->fid.id);
 }
 
 void function_cleanup(struct function* elem) {
-  free(elem->name);
+  free((char*)elem->fid.id);
 }

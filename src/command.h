@@ -4,6 +4,8 @@
 #include <concord/discord.h>
 #include <concord/discord_codecs.h>
 
+#include "fid.h"
+
 struct command_options {
   int size;
   struct command_option* options;
@@ -26,7 +28,7 @@ struct command {
   enum discord_application_command_types type;
   char* name;
   char* description;
-  char* callback;
+  const struct fid* callback;
   struct command_options* options;
   unsigned long default_member_permissions;
 };

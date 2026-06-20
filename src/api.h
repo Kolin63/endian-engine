@@ -154,8 +154,8 @@ struct api {
   const struct plugin* (*plugin_get)(const struct fid* fid);
   // const struct registry* get_function_registry();
   const struct registry* (*get_function_registry)();
-  // const struct function* function_get(char* name);
-  const struct function* (*function_get)(char* name);
+  // const struct function* function_get(const struct fid* fid);
+  const struct function* (*function_get)(const struct fid* fid);
   // const struct registry* get_command_registry();
   const struct registry* (*get_command_registry)();
   // const struct command* command_get(char* name);

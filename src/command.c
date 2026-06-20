@@ -1,4 +1,5 @@
 #include "command.h"
+#include "fid.h"
 
 #include <assert.h>
 #include <concord/application_command.h>
@@ -347,13 +348,22 @@ int command_fillout(const char* mod_name, const char* file_name,
       params->default_member_permissions = perms;
     } else if (strcmp(iter.key, "callback") == 0) {
       END_JSON_CHECK_STRING(iter);
-      char* func = jsmn_iterator_get_string_heap(json, iter.val);
-      if (registry_ktoi(regman_get_function(), &(struct function){.name = func}) == -1) {
+      char* str = jsmn_iterator_get_string_heap(json, iter.val);
+      struct fid fid = fid_split(str);
+      if (fid.ns == NULL) {
+        log_error("Command callback from %s:%s must be in format namespace:function", mod_name, file_name);
+        error++;
+        free(str);
+        return error;
+      }
+      const struct function* func = function_get(&fid);
+      if (func == NULL) {
         log_error("In command %s from mod %s, function %s not registered", file_name, mod_name, func);
         error++;
         continue;
       }
-      params->callback = func;
+      params->callback = &func->fid;
+      free(str);
     } else if (strcmp(iter.key, "options") == 0) {
       END_JSON_CHECK_ARRAY_AND_CHILDREN(iter);
       params->options = malloc(sizeof(struct command_options));
@@ -460,6 +470,5 @@ int command_cmp(const struct command* a, const struct command* b) {
 void command_cleanup(struct command* elem) {
   free(elem->name);
   free(elem->description);
-  free(elem->callback);
   command_options_cleanup(elem->options);
 }
