@@ -12,7 +12,7 @@ void plugin_load(const char* plugin_path, const char* namespace_name, const char
   if (strcmp(plugin_name, "src") == 0) return;
 
   dlerror();  // clear error
-  void* dl = dlopen(plugin_path, RTLD_NOW | RTLD_GLOBAL);
+  void* dl = dlopen(plugin_path, RTLD_NOW);
   if (!dl) {
     log_error("Error loading plugin %s:%s:%s: %s", mod_name, namespace_name, plugin_name, dlerror());
     return;
