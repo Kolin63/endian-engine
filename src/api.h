@@ -4,6 +4,7 @@
 #include <concord/discord.h>
 
 #include "jsmn_iterator.h"
+#include "fid.h"
 
 #define API_VERSION 1
 
@@ -149,8 +150,8 @@ struct api {
   const struct namespace_mod_entry* (*namespace_mod_entry_get)(const struct namespace* ns, const char* name);
   // const struct registry* get_plugin_registry();
   const struct registry* (*get_plugin_registry)();
-  // const struct plugin* plugin_get(char* namespace, char* name);
-  const struct plugin* (*plugin_get)(char* namespace, char* name);
+  // const struct plugin* plugin_get(const struct fid* fid);
+  const struct plugin* (*plugin_get)(const struct fid* fid);
   // const struct registry* get_function_registry();
   const struct registry* (*get_function_registry)();
   // const struct function* function_get(char* name);
@@ -253,6 +254,14 @@ struct api {
   //
   // int save_read(const char* ns, const char* dir, const char* file, const char* ext, char** out);
   int (*save_read)(const char* ns, const char* dir, const char* file, const char* ext, char** out);
+
+  // takes a string formatted as namespace:id and replaces the colon with a null
+  // terminator.
+  // if the string cannot be properly split, it sets the id to the full string and
+  // sets the namespace to NULL
+  //
+  // struct fid fid_split(char* str);
+  struct fid (*fid_split)(char* str);
 };
 
 #ifdef ENDIAN_ENGINE

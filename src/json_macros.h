@@ -75,18 +75,18 @@
 // - const char* json
 // - const char* file_name
 // - const char* mod_name
-#define END_JSON_CHECK_NUMBER_RET(_iter, _ret)                                                          \
-  if (_iter.val->type != JSMN_PRIMITIVE) {                                                              \
-    log_error("In data type %s from mod %s, %s must be number (type)", file_name, mod_name, _iter.key); \
-    _ret;                                                                                               \
-  }                                                                                                     \
-  {                                                                                                     \
-    char val[2];                                                                                        \
-    jsmn_iterator_get_string(val, 2, json, _iter.val);                                                  \
-    if (val[0] != '-' && (val[0] < '0' || val[0] > '9')) {                                              \
-      log_error("In data type %s from mod %s, %s must be bool (char)", file_name, mod_name, _iter.key); \
-      _ret;                                                                                             \
-    }                                                                                                   \
+#define END_JSON_CHECK_NUMBER_RET(_iter, _ret)                                                            \
+  if (_iter.val->type != JSMN_PRIMITIVE) {                                                                \
+    log_error("In data type %s from mod %s, %s must be number (type)", file_name, mod_name, _iter.key);   \
+    _ret;                                                                                                 \
+  }                                                                                                       \
+  {                                                                                                       \
+    char val[2];                                                                                          \
+    jsmn_iterator_get_string(val, 2, json, _iter.val);                                                    \
+    if (val[0] != '-' && (val[0] < '0' || val[0] > '9')) {                                                \
+      log_error("In data type %s from mod %s, %s must be number (char)", file_name, mod_name, _iter.key); \
+      _ret;                                                                                               \
+    }                                                                                                     \
   }
 
 // checks that a number is the proper type

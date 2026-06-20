@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "fid.h"
 #include "fileio.h"
 #include "jsmn_iterator.h"
 #include "json_macros.h"
@@ -50,39 +51,22 @@ int function_fillout(const char* namespace_name, const char* mod_name,
       func->name = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "plugin") == 0) {
       END_JSON_CHECK_STRING(iter);
-      // mod:namespace
-      char* fullname = jsmn_iterator_get_string_heap(json, iter.val);
-      // split to mod and namespace
+      // namespace:plugin
+      char* str = jsmn_iterator_get_string_heap(json, iter.val);
 
-      char* colon_pos = fullname;
+      struct fid fid = fid_split(str);
 
-      while (*colon_pos != ':' && *colon_pos != '\0') colon_pos++;
-
-      if (*colon_pos != ':' || colon_pos == fullname) {
-        log_error("Could not load plugin name in format mod:namespace from %s:%s:%s", mod_name, namespace_name, file_name);
-        free(fullname);
+      if (fid.ns == NULL) {
+        log_error("Could not load plugin name in format namespace:plugin from %s:%s:%s", mod_name, namespace_name, file_name);
+        free(str);
         error++;
         continue;
       }
 
-      // ccc:ccccc
-      // len 9
-      // colon 3
-      // ns len 3-0+1=4
-      // name len 5+1=6
+      const struct plugin* plugin = plugin_get(&fid);
+      func->plugin_fid = &plugin->fid;
 
-      // set colon to null term to make two strings
-      *colon_pos = '\0';
-      const char* plugin_namespace = fullname;
-      const char* plugin_name = colon_pos + 1;
-
-      func->plugin_namespace = malloc(colon_pos - fullname + 1);
-      strcpy(func->plugin_namespace, plugin_namespace);
-
-      func->plugin_name = malloc(strlen(plugin_name) + 1);
-      strcpy(func->plugin_name, plugin_name);
-
-      free(fullname);
+      free(str);
     } else {
       log_error("Function %s:%s:%s has unknown object %s", namespace_name, mod_name, file_name, iter.key);
       error++;
@@ -116,10 +100,10 @@ void function_load(const char* function_path, const char* namespace_name, const 
   free(json);
   free(jsmn);
 
-  const struct plugin* plugin = plugin_get(func.plugin_namespace, func.plugin_name);
+  const struct plugin* plugin = plugin_get(func.plugin_fid);
   if (plugin == NULL) {
     log_error("Could not find plugin %s:%s while loading function %s:%s:%s",
-              func.plugin_namespace, func.plugin_name, namespace_name, mod_name, func.name);
+              func.plugin_fid->ns, func.plugin_fid->id, namespace_name, mod_name, func.name);
     return;
   }
 
@@ -140,7 +124,7 @@ void function_load(const char* function_path, const char* namespace_name, const 
     return;
   }
 
-  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.name, func.plugin_namespace, func.plugin_name);
+  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.name, func.plugin_fid->ns, func.plugin_fid->id);
 }
 
 const struct function* function_get(char* name) {
@@ -153,6 +137,4 @@ int function_cmp(const struct function* a, const struct function* b) {
 
 void function_cleanup(struct function* elem) {
   free(elem->name);
-  free(elem->plugin_name);
-  free(elem->plugin_namespace);
 }

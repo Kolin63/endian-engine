@@ -1,6 +1,8 @@
 #ifndef ENDIAN_FUNCTION_H_
 #define ENDIAN_FUNCTION_H_
 
+#include "fid.h"
+
 #include <concord/discord.h>
 
 enum function_type {
@@ -20,8 +22,7 @@ struct function {
   enum function_type type;
   const void (*function)(...);
   char* name;
-  char* plugin_namespace;
-  char* plugin_name;
+  const struct fid* plugin_fid;
 };
 
 #ifdef ENDIAN_ENGINE

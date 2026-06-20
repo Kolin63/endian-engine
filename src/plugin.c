@@ -27,10 +27,10 @@ void plugin_load(const char* plugin_path, const char* namespace_name, const char
 
   struct plugin plugin;
   plugin.plugin = dl;
-  plugin.namespace = malloc(strlen(namespace_name + 1));
-  strcpy(plugin.namespace, namespace_name);
-  plugin.name = malloc(strlen(clean_name) + 1);
-  strcpy(plugin.name, clean_name);
+  plugin.fid.ns = malloc(strlen(namespace_name + 1));
+  strcpy((char*)plugin.fid.ns, namespace_name);
+  plugin.fid.id = malloc(strlen(clean_name) + 1);
+  strcpy((char*)plugin.fid.id, clean_name);
 
   if (registry_add(regman_get_plugin(), &plugin) == NULL) {
     log_error("Plugin %s:%s:%s already registered", mod_name, namespace_name, plugin_name);
@@ -40,18 +40,18 @@ void plugin_load(const char* plugin_path, const char* namespace_name, const char
   free(clean_name);
 }
 
-const struct plugin* plugin_get(char* namespace, char* name) {
-  return registry_ktov(regman_get_plugin(), &(struct plugin){.namespace = namespace, .name = name});
+const struct plugin* plugin_get(const struct fid* fid) {
+  return registry_ktov(regman_get_plugin(), &(struct plugin){.fid = *fid});
 }
 
 int plugin_cmp(const struct plugin* a, const struct plugin* b) {
-  int namespace = registry_strcmp(a->namespace, b->namespace);
+  int namespace = registry_strcmp(a->fid.ns, b->fid.ns);
   if (namespace != 0) return namespace;
-  return registry_strcmp(a->name, b->name);
+  return registry_strcmp(a->fid.id, b->fid.id);
 }
 
 void plugin_cleanup(struct plugin* elem) {
-  free(elem->namespace);
-  free(elem->name);
+  free((char*)elem->fid.ns);
+  free((char*)elem->fid.id);
   dlclose(elem->plugin);
 }
