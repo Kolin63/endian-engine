@@ -127,7 +127,7 @@ void function_load(const char* function_path, const char* namespace_name, const 
     return;
   }
 
-  log_info("Loading function %s:%s:%s from plugin %s:%s", namespace_name, mod_name, func.fid.id, func.plugin_fid->ns, func.plugin_fid->id);
+  log_info("Loading function %s:%s:%s from plugin %s:%s", mod_name, namespace_name, func.fid.id, func.plugin_fid->ns, func.plugin_fid->id);
 }
 
 const struct function* function_get(const struct fid* fid) {
