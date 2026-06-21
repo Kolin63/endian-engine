@@ -24,8 +24,8 @@
 
 void mod_loader_namespace_load(const struct discord_ready* event, const char* namespace_path, const char* namespace_name, const char* mod_name) {
   namespace_load(mod_name, namespace_name);
-  mod_dir_load(namespace_path, "plugins", plugin_load(file_path, namespace_name, mod_name, file_name));
-  mod_dir_load(namespace_path, "functions", function_load(file_path, namespace_name, mod_name, file_name));
+  mod_dir_load(namespace_path, "plugins", plugin_load(file_path, mod_name, namespace_name, file_name));
+  mod_dir_load(namespace_path, "functions", function_load(file_path, mod_name, namespace_name, file_name));
   mod_dir_load(namespace_path, "commands", command_load(event, file_path, mod_name, file_name));
 }
 

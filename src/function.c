@@ -17,7 +17,7 @@
 #include "regman.h"
 
 // returns amount of errors, 0 if ok
-int function_fillout(const char* namespace_name, const char* mod_name,
+int function_fillout(const char* mod_name, const char* namespace_name,
                      const char* file_name, const jsmntok_t* jsmn,
                      const char* json, struct function* func) {
   int error = 0;
@@ -45,7 +45,7 @@ int function_fillout(const char* namespace_name, const char* mod_name,
       else if (strcmp(val, "SAVE") == 0) func->type = FT_SAVE;
       else if (strcmp(val, "CLEANUP") == 0) func->type = FT_CLEANUP;
       else {
-        log_error("In function %s:%s:%s, unknown type %s", namespace_name, mod_name, file_name, val);
+        log_error("In function %s:%s:%s, unknown type %s", mod_name, namespace_name, file_name, val);
         error++;
         continue;
       }
@@ -71,7 +71,7 @@ int function_fillout(const char* namespace_name, const char* mod_name,
 
       free(str);
     } else {
-      log_error("Function %s:%s:%s has unknown object %s", namespace_name, mod_name, file_name, iter.key);
+      log_error("Function %s:%s:%s has unknown object %s", mod_name, namespace_name, file_name, iter.key);
       error++;
       continue;
     }
@@ -80,12 +80,12 @@ int function_fillout(const char* namespace_name, const char* mod_name,
   return error;
 }
 
-void function_load(const char* function_path, const char* namespace_name, const char* mod_name, const char* file_name) {
+void function_load(const char* function_path, const char* mod_name, const char* namespace_name, const char* file_name) {
   if (strcmp(file_name, "template.json") == 0) return;
 
   FILE* file = fopen(function_path, "r");
   if (file == NULL) {
-    log_error("Could not open %s at %s from %s:%s", file_name, function_path, namespace_name, mod_name);
+    log_error("Could not open %s at %s from %s:%s", file_name, function_path, mod_name, namespace_name);
     return;
   }
   char* json = fileio_read_all(file);
@@ -94,7 +94,7 @@ void function_load(const char* function_path, const char* namespace_name, const 
   jsmntok_t* jsmn = fileio_read_json(json);
 
   struct function func = {};
-  if (function_fillout(namespace_name, mod_name, file_name, jsmn, json, &func) != 0) {
+  if (function_fillout(mod_name, namespace_name, file_name, jsmn, json, &func) != 0) {
     free(json);
     free(jsmn);
     return;
@@ -106,7 +106,7 @@ void function_load(const char* function_path, const char* namespace_name, const 
   const struct plugin* plugin = plugin_get(func.plugin_fid);
   if (plugin == NULL) {
     log_error("Could not find plugin %s:%s while loading function %s:%s:%s",
-              func.plugin_fid->ns, func.plugin_fid->id, namespace_name, mod_name, file_name);
+              func.plugin_fid->ns, func.plugin_fid->id, mod_name, namespace_name, file_name);
     return;
   }
 
@@ -116,14 +116,14 @@ void function_load(const char* function_path, const char* namespace_name, const 
   const char* error = dlerror();
   if (error != NULL) {
     log_error("Error loading function %s:%s:%s (%s)",
-              namespace_name, mod_name, func.fid.id, error);
+              mod_name, namespace_name, func.fid.id, error);
     return;
   }
 
   func.function = handle;
 
   if (registry_add(regman_get_function(), &func) == NULL) {
-    log_error("Function %s:%s:%s already registered", namespace_name, mod_name, func.fid.id);
+    log_error("Function %s:%s:%s already registered", mod_name, namespace_name, func.fid.id);
     return;
   }
 

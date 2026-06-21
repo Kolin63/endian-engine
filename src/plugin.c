@@ -8,7 +8,7 @@
 #include "registry.h"
 #include "regman.h"
 
-void plugin_load(const char* plugin_path, const char* namespace_name, const char* mod_name, const char* plugin_name) {
+void plugin_load(const char* plugin_path, const char* mod_name, const char* namespace_name, const char* plugin_name) {
   if (strcmp(plugin_name, "src") == 0) return;
 
   dlerror();  // clear error

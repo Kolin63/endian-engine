@@ -27,7 +27,7 @@ struct function {
 
 #ifdef ENDIAN_ENGINE
 
-void function_load(const char* function_path, const char* namespace_name, const char* mod_name, const char* file_name);
+void function_load(const char* function_path, const char* mod_name, const char* namespace_name, const char* file_name);
 const struct function* function_get(const struct fid* fid);
 
 int function_cmp(const struct function* a, const struct function* b);
