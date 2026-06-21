@@ -369,7 +369,7 @@ int command_fillout(const char* mod_name, const char* file_name,
       params->options = malloc(sizeof(struct command_options));
       params->options->options = NULL;
       params->options->size = 0;
-      command_options_fillout(mod_name, file_name, iter.val, json, params->options);
+      error += command_options_fillout(mod_name, file_name, iter.val, json, params->options);
     } else {
       log_error("Command %s from mod %s has unknown object %s", file_name, mod_name, iter.key);
       error++;
