@@ -17,7 +17,9 @@ set_target_properties(concord PROPERTIES
 
 target_link_libraries(${PROJECT_NAME} PRIVATE concord CURL::libcurl)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+target_include_directories(${PROJECT_NAME} PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   C_STANDARD 23

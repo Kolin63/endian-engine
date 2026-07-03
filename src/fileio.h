@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define JSMN_STATIC
+#define JSMN_HEADER
 #include <concord/jsmn.h>
 
 // Moves all contents of file into a buffer. buf must be freed after use

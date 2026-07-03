@@ -29,7 +29,7 @@
 #ifndef KOLIN_JSMN_ITERATOR_H_
 #define KOLIN_JSMN_ITERATOR_H_
 
-#define JSMN_STATIC
+#define JSMN_HEADER
 #include <concord/jsmn.h>
 
 // used to iterate through JSMN tokens. initialized with jsmn_iterator_init().

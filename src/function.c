@@ -1,10 +1,12 @@
 #include "function.h"
 
-#include <concord/jsmn.h>
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define JSMN_HEADER
+#include <concord/jsmn.h>
 
 #include "fid.h"
 #include "fileio.h"

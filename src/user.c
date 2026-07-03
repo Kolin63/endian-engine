@@ -78,7 +78,7 @@ struct user* user_init(unsigned long uuid) {
   avatar = realloc(avatar, strlen(avatar) + 1);
   user->avatar = avatar;
 
-  discord_user_cleanup(&sync);
+  discord_data_cleanup(bot_get_global()->discord_bot, &sync);
 
   user_init_status = USER_INIT_STATUS_IDLE;
 

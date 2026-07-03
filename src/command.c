@@ -5,7 +5,6 @@
 #include <concord/application_command.h>
 #include <concord/discord.h>
 #include <concord/discord_codecs.h>
-#include <concord/jsmn.h>
 #include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
