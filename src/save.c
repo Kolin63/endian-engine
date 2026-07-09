@@ -15,7 +15,7 @@ int save_write(const char* ns, const char* dir, const char* file,
   char* path = malloc(strlen(bot_get_global()->instance_dir) + 6 + strlen(ns) +
                       1 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
   strcpy(path, bot_get_global()->instance_dir);
-  strcat(path, "/save/");
+  strcat(path, "/saves/");
   strcat(path, ns);
 
   // check that the namespace directory exists
@@ -55,7 +55,7 @@ int save_write(const char* ns, const char* dir, const char* file,
   return 0;
 }
 
-// predir should be "save" or "mods/modname/data/rom"
+// predir should be "saves" or "mods/modname/data/rom"
 int save_or_rom_read(const char* predir, const char* ns, const char* dir,
                      const char* file, const char* ext, char** out) {
   char* path = malloc(strlen(bot_get_global()->instance_dir) + 1 +
@@ -107,5 +107,5 @@ int save_or_rom_read(const char* predir, const char* ns, const char* dir,
 
 int save_read(const char* ns, const char* dir, const char* file,
               const char* ext, char** out) {
-  return save_or_rom_read("save", ns, dir, file, ext, out);
+  return save_or_rom_read("saves", ns, dir, file, ext, out);
 }
