@@ -15,6 +15,7 @@ static volatile sig_atomic_t cleanup_ready = 0;
 
 void cleanup() {
   log_info("Stopping...");
+  api_call_save();
   if (bot_get_global() != NULL) {
     discord_shutdown(bot_get_global()->discord_bot);
   }
