@@ -251,6 +251,7 @@ struct api {
   // dir does not need a trailing slash
   // ext is file extension, and it should not include the dot. for example, a
   // json file has the extension "json", not ".json"
+  // out buf should be set to NULL
   //
   // int save_read(const char* ns, const char* dir, const char* file, const char* ext, char** out);
   int (*save_read)(const char* ns, const char* dir, const char* file, const char* ext, char** out);
