@@ -77,6 +77,7 @@ void api_init() {
   global->save_read = save_read;
 
   global->fid_split = fid_split;
+  global->fid_to_json = fid_to_json;
 }
 
 void api_cleanup() { free(global); }

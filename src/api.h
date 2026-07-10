@@ -262,6 +262,12 @@ struct api {
   //
   // struct fid fid_split(char* str);
   struct fid (*fid_split)(char* str);
+
+  // returns string in the format:
+  // {"ns":"...","id":"..."}
+  // caller is responsible for freeing string
+  // char* fid_to_json(const struct fid* fid);
+  char* (*fid_to_json)(const struct fid* fid);
 };
 
 #ifdef ENDIAN_ENGINE

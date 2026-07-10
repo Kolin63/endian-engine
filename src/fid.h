@@ -15,4 +15,9 @@ struct fid {
 // sets the namespace to NULL
 struct fid fid_split(char* str);
 
+// returns string in the format:
+// {"ns":"...","id":"..."}
+// caller is responsible for freeing string
+char* fid_to_json(const struct fid* fid);
+
 #endif
