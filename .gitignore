@@ -3,7 +3,6 @@
 !.gitignore
 !.clang-format
 !CMakeLists.txt
-!make_include.sh
 !licenses
 !licenses/*
 
