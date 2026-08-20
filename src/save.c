@@ -9,13 +9,13 @@
 #include "bot.h"
 #include "fileio.h"
 #include "log.h"
+#include "../ref/instance_dir.h"
 
 int save_write(const char* ns, const char* dir, const char* file,
                const char* ext, const char* content) {
-  char* path = malloc(strlen(bot_get_global()->instance_dir) + 6 + strlen(ns) +
+  char* path = malloc(strlen(INSTANCE_DIR) + 6 + strlen(ns) +
                       1 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
-  strcpy(path, bot_get_global()->instance_dir);
-  strcat(path, "/saves/");
+  strcat(path, INSTANCE_DIR "/saves/");
   strcat(path, ns);
 
   // check that the namespace directory exists
@@ -58,11 +58,10 @@ int save_write(const char* ns, const char* dir, const char* file,
 // predir should be "saves" or "mods/modname/data/rom"
 int save_or_rom_read(const char* predir, const char* ns, const char* dir,
                      const char* file, const char* ext, char** out) {
-  char* path = malloc(strlen(bot_get_global()->instance_dir) + 1 +
+  char* path = malloc(strlen(INSTANCE_DIR) + 1 +
                       strlen(predir) + 1 + strlen(ns) + 1 + strlen(dir) + 1 +
                       strlen(file) + 1 + strlen(ext) + 1);
-  strcpy(path, bot_get_global()->instance_dir);
-  strcat(path, "/");
+  strcat(path, INSTANCE_DIR "/");
   strcat(path, predir);
   strcat(path, "/");
   strcat(path, ns);

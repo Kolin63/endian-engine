@@ -1,8 +1,5 @@
 #include "user.h"
 
-#include "registry.h"
-#include "regman.h"
-
 #include <pthread.h>
 #include <concord/discord.h>
 #include <concord/discord-response.h>
@@ -13,6 +10,8 @@
 
 #include "bot.h"
 #include "log.h"
+#include "registry.h"
+#include "regman.h"
 
 enum user_init_status {
   USER_INIT_STATUS_IDLE,

@@ -4,41 +4,40 @@
 #include <concord/discord.h>
 #include <concord/discord_codecs.h>
 
-#include "fid.h"
-
 struct command_options {
-  int size;
-  struct command_option* options;
+  const int size;
+  const struct command_option* options;
 };
 
 struct command_option {
-  bool required;
-  bool autocomplete;
-  enum discord_application_command_option_types type;
-  char* name;
-  char* description;
-  struct discord_application_command_option_choices* choices;
-  struct command_options* options;
-  struct integers* channel_types;
-  char* min_value;
-  char* max_value;
+  const bool required;
+  const bool autocomplete;
+  const enum discord_application_command_option_types type;
+  const char* name;
+  const char* description;
+  const struct discord_application_command_option_choices choices;
+  const struct command_options options;
+  const struct integers channel_types;
+  const char* min_value;
+  const char* max_value;
 };
 
 struct command {
-  enum discord_application_command_types type;
-  char* name;
-  char* description;
-  const struct fid* callback;
-  struct command_options* options;
-  unsigned long default_member_permissions;
+  const enum discord_application_command_types type;
+  const char* name;
+  const char* description;
+  const struct command_options options;
+  const unsigned long default_member_permissions;
 };
 
-void command_load(const struct discord_ready* event, const char* command_path,
-                  const char* mod_name, const char* file_name);
-const struct command* command_get(char* name);
+enum command_id;
 
-int command_cmp(const struct command* a, const struct command* b);
+const static struct command commands[];
 
-void command_cleanup(struct command* elem);
+static void command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event);
+static void command_create_all(const struct discord_ready* event);
+static enum command_id command_id_get(const char* str);
+
+#include "../ref/commands.h"
 
 #endif

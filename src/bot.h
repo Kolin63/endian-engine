@@ -4,8 +4,6 @@
 #include <concord/discord.h>
 
 struct bot {
-  char* instance_dir;
-
   struct discord* discord_bot;
 };
 
