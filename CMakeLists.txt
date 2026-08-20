@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(server C)
-
-file(GLOB SOURCES "src/*.c" "dependencies/*.c")
-
-add_executable(${PROJECT_NAME} ${SOURCES})
-add_compile_definitions(ENDIAN_ENGINE)
-
 find_package(CURL REQUIRED)
 
 add_library(concord STATIC IMPORTED)
@@ -15,13 +8,39 @@ set_target_properties(concord PROPERTIES
   IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/libdiscord.a"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE concord CURL::libcurl)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+project(reflector C)
+
+file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/save.c" "src/fileio.c")
+
+add_executable(reflector ${REFLECTOR_SRC})
+
+target_link_libraries(reflector PRIVATE concord CURL::libcurl)
+
+target_include_directories(reflector PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(reflector PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED ON
+)
+
+
+project(server C)
+
+file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c")
+
+add_executable(server ${SERVER_SRC})
+add_compile_definitions(ENDIAN_ENGINE)
+
+target_link_libraries(server PRIVATE concord CURL::libcurl)
+
+target_include_directories(server PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+set_target_properties(server PROPERTIES
   C_STANDARD 23
   C_STANDARD_REQUIRED ON
 )

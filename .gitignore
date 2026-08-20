@@ -12,3 +12,8 @@
 !src
 !src/*.c
 !src/*.h
+!mir
+!mir/*.c
+!mir/*.h
+!mirrors
+!mirrors/*.json
