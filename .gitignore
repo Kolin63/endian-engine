@@ -7,6 +7,9 @@
 !licenses
 !licenses/*
 
+!dependencies
+!dependencies/*.c
+!dependencies/*.h
 !src
 !src/*.c
 !src/*.h
