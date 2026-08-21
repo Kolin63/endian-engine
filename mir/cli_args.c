@@ -44,6 +44,12 @@ void cli_args_parse(struct cli_args* x, int argc, const char** argv) {
     }
   }  // done parsing args
 
+  if (x->instance_dir == NULL) {
+    print_usage(argv[0]);
+    cli_args_cleanup(x);
+    exit(1);
+  }
+
   if (x->default_root == true) {
     char* buf = x->instance_dir;
 #ifdef __linux__
