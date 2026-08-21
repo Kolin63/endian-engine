@@ -208,12 +208,14 @@ int mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, cons
 
 void mirror_cleanup(struct mirror* m) {
   if (m == NULL) return;
+  if (m->id != NULL) free(m->id);
   mirror_files_cleanup(&m->files);
 }
 
 int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
+  m->id = NULL;
   m->files.arr = NULL;
   m->files.len = 0;
 
@@ -223,7 +225,10 @@ int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) 
   END_JSON_CHECK_OBJECT_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
-    if (strcmp(iter.key, "files") == 0) {
+    if (strcmp(iter.key, "id") == 0) {
+      END_JSON_CHECK_STRING(iter);
+      m->id = jsmn_iterator_get_string_heap(json, iter.key);
+    } else if (strcmp(iter.key, "files") == 0) {
       END_JSON_CHECK_ARRAY(iter);
       error += mirror_files_from_json(&m->files, iter.val, json);
     } else {

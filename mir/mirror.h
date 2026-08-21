@@ -40,6 +40,7 @@ struct mirror_files {
 };
 
 struct mirror {
+  char* id;
   struct mirror_files files;
 };
 
