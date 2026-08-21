@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "core_mirrors.h"
 #include "log.h"
 #include "mod_stack.h"
 #include "mirror.h"
@@ -20,6 +21,9 @@
 
 void mod_loader_mod_load(const char* mod_path) {
   log_info("Loading mod %s", mod_stack.mod);
+
+  mod_stack.file = "core_mirrors.h";
+  mirror_load_from_str(ENDIAN_CORE_MIRRORS_COMMANDS);
 
   mod_dir_load(mod_path, "mirrors", mod_stack.file = file_name; mirror_load(file_path));
 }

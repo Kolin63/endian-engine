@@ -248,16 +248,19 @@ void mirror_load(const char* file_path) {
   char* json = fileio_read_all(file);
   fclose(file);
 
-  jsmntok_t* jsmn = fileio_read_json(json);
+  mirror_load_from_str(json);
+  free(json);
+}
+
+void mirror_load_from_str(const char* str) {
+  jsmntok_t* jsmn = fileio_read_json(str);
 
   struct mirror m;
-  if (mirror_from_json(&m, jsmn, json) != 0) {
-    free(json);
+  if (mirror_from_json(&m, jsmn, str) != 0) {
     free(jsmn);
     return;
   }
 
-  free(json);
   free(jsmn);
 
   mirrors.len++;

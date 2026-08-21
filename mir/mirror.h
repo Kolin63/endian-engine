@@ -71,6 +71,7 @@ int mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, cons
 void mirror_cleanup(struct mirror* m);
 int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json);
 void mirror_load(const char* file_path);
+void mirror_load_from_str(const char* str);
 
 void mirrors_cleanup(struct mirrors* arr);
 
