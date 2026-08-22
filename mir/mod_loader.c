@@ -9,6 +9,7 @@
 #include "mod_stack.h"
 #include "mirror.h"
 #include "../src/fileio.h"
+#include "serial_file.h"
 
 #define mod_dir_load(pre_path, path, func)                            \
   {                                                                   \
@@ -18,6 +19,24 @@
     dir_load(fullpath, func);                                         \
     free(fullpath);                                                   \
   }
+
+void mod_loader_mod_ns_data_dir_load(const char* file_path, const struct mirror* mir) {
+  struct serial_file sf = {};
+  serial_file_load(&sf, file_path);
+  serial_file_cleanup(&sf);
+}
+
+void mod_loader_mod_ns_data_load(const char* file_path, const char* file_name) {
+  for (size_t i = 0; i < mirrors_global()->len; i++) {
+    if (strcmp(mirrors_global()->arr[i].id, file_name) == 0) {
+      mod_dir_load(file_path, "", mod_stack_global()->file = file_name; mod_loader_mod_ns_data_dir_load(file_path, &mirrors_global()->arr[i]));
+    }
+  }
+}
+
+void mod_loader_mod_ns_load(const char* file_path) {
+  mod_dir_load(file_path, "", mod_loader_mod_ns_data_load(file_path, file_name));
+}
 
 void mod_loader_mod_load(const char* mod_path) {
   log_info("Loading mod %s", mod_stack_global()->mod);
