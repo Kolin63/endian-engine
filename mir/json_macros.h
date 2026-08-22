@@ -9,8 +9,6 @@
 // checks that a bool is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_BOOL_RET(_iter, _ret)                                       \
   if (_iter.val->type != JSMN_PRIMITIVE) {                                         \
     log_error(MOD_STACK_FMT "%s must be bool (type)", MOD_STACK_ARG, _iter.key);   \
@@ -29,15 +27,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_BOOL(_iter) END_JSON_CHECK_BOOL_RET(_iter, error++; continue);
 
 // checks that a null value is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_NULL_RET(_iter, _ret)                                       \
   if (_iter.val->type != JSMN_PRIMITIVE) {                                         \
     log_error(MOD_STACK_FMT "%s must be null (type)", MOD_STACK_ARG, _iter.key);   \
@@ -56,15 +51,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_NULL(_iter) END_JSON_CHECK_NULL_RET(_iter, error++; continue);
 
 // checks that a number is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_NUMBER_RET(_iter, _ret)                                       \
   if (_iter.val->type != JSMN_PRIMITIVE) {                                           \
     log_error(MOD_STACK_FMT "%s must be number (type)", MOD_STACK_ARG, _iter.key);   \
@@ -83,15 +75,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_NUMBER(_iter) END_JSON_CHECK_NUMBER_RET(_iter, error++; continue);
 
 // checks that a string is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_STRING_RET(_iter, _ret)                              \
   if (_iter.val->type != JSMN_STRING) {                                     \
     log_error(MOD_STACK_FMT "%s must be string", MOD_STACK_ARG, _iter.key); \
@@ -102,15 +91,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_STRING(_iter) END_JSON_CHECK_STRING_RET(_iter, error++; continue);
 
 // checks that string length is: min <= length <= max. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_STRING_LENGTH_RET(_iter, _ret, min, max)              \
   {                                                                          \
     int len = _iter.val->end - _iter.val->start;                             \
@@ -124,15 +110,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_STRING_LENGTH(_iter, min, max) END_JSON_CHECK_STRING_LENGTH_RET(_iter, error++; continue, min, max);
 
 // checks that an array is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_ARRAY_RET(_iter, _ret)                              \
   if (_iter.val->type != JSMN_ARRAY) {                                     \
     log_error(MOD_STACK_FMT "%s must be array", MOD_STACK_ARG, _iter.key); \
@@ -143,7 +126,6 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_ARRAY(_iter) END_JSON_CHECK_ARRAY_RET(_iter, error++; continue);
 
@@ -151,8 +133,6 @@
 // return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(_iter, _ret)                   \
   END_JSON_CHECK_ARRAY_RET(_iter, _ret);                                     \
   if (_iter.val->size == 0) {                                                \
@@ -164,15 +144,12 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_ARRAY_AND_CHILDREN(_iter) END_JSON_CHECK_ARRAY_AND_CHILDREN_RET(_iter, error++; continue);
 
 // checks that an object is the proper type. custom return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_OBJECT_RET(_iter, _ret)                              \
   if (_iter.val->type != JSMN_OBJECT) {                                     \
     log_error(MOD_STACK_FMT "%s must be object", MOD_STACK_ARG, _iter.key); \
@@ -183,7 +160,6 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_OBJECT(_iter) END_JSON_CHECK_OBJECT_RET(_iter, error++; continue);
 
@@ -191,8 +167,6 @@
 // return
 // params:
 // - const jsmn_iterator _iter
-// assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 #define END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(_iter, _ret)                  \
   END_JSON_CHECK_OBJECT_RET(_iter, _ret);                                    \
   if (_iter.val->size == 0) {                                                \
@@ -204,7 +178,6 @@
 // params:
 // - const jsmn_iterator _iter
 // assumes that the following variables exist:
-// - static struct mod_stack mod_stack
 // - int error
 #define END_JSON_CHECK_OBJECT_AND_CHILDREN(_iter) END_JSON_CHECK_OBJECT_AND_CHILDREN_RET(_iter, error++; continue);
 

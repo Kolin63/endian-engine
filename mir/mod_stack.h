@@ -7,13 +7,9 @@ struct mod_stack {
   const char* file;
 };
 
-static struct mod_stack mod_stack = {
-    .mod = "",
-    .ns = "",
-    .file = "",
-};
+struct mod_stack* g_mod_stack();
 
 #define MOD_STACK_FMT "%s:%s:%s "
-#define MOD_STACK_ARG mod_stack.mod, mod_stack.ns, mod_stack.file
+#define MOD_STACK_ARG g_mod_stack()->mod, g_mod_stack()->ns, g_mod_stack()->file
 
 #endif
