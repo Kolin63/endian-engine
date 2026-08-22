@@ -10,7 +10,7 @@
             \"#define ENDIAN_REFLECTIONS_COMMANDS_H_\",\
             \"\",\
             \"#include \\\"../src/command.h\\\"\",\
-            \"\",\
+            \"\"\
           ]\
         },\
 \
@@ -30,7 +30,7 @@
           ],\
           \"postfix\": [\
             \"};\",\
-            \"\",\
+            \"\"\
           ]\
         },\
 \
@@ -43,7 +43,7 @@
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  [COMMAND_%D] = %s,\"\
+                \"  [COMMAND_%D] = %s\"\
               ]\
             }\
           ],\
@@ -104,7 +104,7 @@
 \
         {\
           \"prefix\": [\
-            \"enum command_id command_id_get(const char* str) {\",\
+            \"enum command_id command_id_get(const char* str) {\"\
           ],\
           \"foreach\": [\
             {\
@@ -124,13 +124,13 @@
         {\
           \"prefix\": [\
             \"void command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event) {\",\
-            \"  switch (id) {\",\
+            \"  switch (id) {\"\
           ],\
           \"foreach\": [\
             {\
               \"tag\": \"command_cb\",\
               \"format\": [\
-                \"  case COMMAND_%D: %n_%d_cb(client, event); return;\
+                \"  case COMMAND_%D: %n_%d_cb(client, event); return;\"\
               ]\
             }\
           ],\
@@ -143,13 +143,13 @@
 \
         {\
           \"prefix\": [\
-            \"void command_create_all(const struct discord_ready* event) {\",\
+            \"void command_create_all(const struct discord_ready* event) {\"\
           ],\
           \"foreach\": [\
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  command_create(commands[COMMAND_%D], event);\
+                \"  command_create(commands[COMMAND_%D], event);\"\
               ]\
             }\
           ],\
