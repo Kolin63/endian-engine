@@ -44,16 +44,19 @@ int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
   char* line = malloc(LINE_BUF_SIZE);
 
   while (1) {
-    const char* tag_id = NULL;
+    char* tag_id = NULL;
     struct mirror_strings data = {};
     char* buf;
 
     if (fgets(line, LINE_BUF_SIZE, file) == NULL) break;
 
     if (strncmp(line, "ENDIAN_MIRROR_TAG_START(", 24) == 0) {
-      tag_id = serial_file_tag_get_param(line);
+      char* str = serial_file_tag_get_param(line);
+      tag_id = malloc(strlen(str) + 1);
+      strcpy(tag_id, str);
       if (tag_id[0] == '\0') log_warn(MOD_STACK_FMT "mirror tag has no id", MOD_STACK_ARG);
     } else {
+      if (tag_id != NULL) free(tag_id);
       continue;
     }
 
@@ -86,14 +89,11 @@ int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
     tags->len++;
     tags->arr = realloc(tags->arr, tags->len * sizeof(struct serial_file_tag));
 
-    struct serial_file_tag* tag = &tags->arr[data.len - 1];
+    struct serial_file_tag* tag = &tags->arr[tags->len - 1];
 
-    tag->id = malloc(strlen(tag_id) + 1);
-    strcpy(tag->id, tag_id);
+    tag->id = tag_id;
     tag->data = data;
     tag->buf = buf;
-
-    free(buf);
   }
   free(line);
 
@@ -115,14 +115,14 @@ void serial_file_load(struct serial_file* s, const char* file_path) {
     return;
   }
 
-  fclose(file);
-
-  if (!serial_file_tags_fillout(&s->tags, file)) {
+  if (serial_file_tags_fillout(&s->tags, file) != 0) {
     log_error(MOD_STACK_FMT "could not parse file", MOD_STACK_ARG);
     return;
   }
 
-  log_info("Loading mirror %s", mod_stack.file);
+  fclose(file);
+
+  log_info("Serializing file %s", g_mod_stack()->file);
 }
 
 void serial_files_cleanup(struct serial_files* x) {
