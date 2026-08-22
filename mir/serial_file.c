@@ -35,10 +35,11 @@ serial_file_tag_get_param(char* line) {
 
 void
 serial_file_tags_cleanup(struct serial_file_tags* x) {
-  if (x == NULL) return;
+  if (x == NULL || x->len == 0) return;
   for (size_t i = 0; i < x->len; i++) {
     serial_file_tag_cleanup(&x->arr[i]);
   }
+  free(x->arr);
 }
 
 int
@@ -132,8 +133,9 @@ serial_file_load(struct serial_file* s, const char* file_path) {
 
 void
 serial_files_cleanup(struct serial_files* x) {
-  if (x == NULL) return;
+  if (x == NULL || x->len == 0) return;
   for (size_t i = 0; i < x->len; i++) {
     serial_file_cleanup(&x->arr[i]);
   }
+  free(x->arr);
 }
