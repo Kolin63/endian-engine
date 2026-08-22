@@ -7,6 +7,7 @@
 
 #define JSMN_HEADER
 #include <concord/jsmn.h>
+#include <log.h>
 
 #define LINE_BUF_SIZE 65536
 
@@ -43,6 +44,8 @@ jsmntok_t* fileio_read_json(const char* json) {
       len += 128;
       continue;
     } else {
+      if (err == JSMN_ERROR_INVAL) log_error("JSMN_ERROR_INVAL");
+      else if (err == JSMN_ERROR_PART) log_error("JSMN_ERROR_PART");
       free(tokens);
       return NULL;
     }
