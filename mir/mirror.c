@@ -229,7 +229,7 @@ int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) 
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "id") == 0) {
       END_JSON_CHECK_STRING(iter);
-      m->id = jsmn_iterator_get_string_heap(json, iter.key);
+      m->id = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "files") == 0) {
       END_JSON_CHECK_ARRAY(iter);
       error += mirror_files_from_json(&m->files, iter.val, json);
