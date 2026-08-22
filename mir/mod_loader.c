@@ -20,16 +20,19 @@
   }
 
 void mod_loader_mod_load(const char* mod_path) {
-  log_info("Loading mod %s", mod_stack.mod);
+  log_info("Loading mod %s", g_mod_stack()->mod);
 
-  mod_stack.file = "core_mirrors.h";
+  g_mod_stack()->file = "core_mirrors.h";
   mirror_load_from_str(ENDIAN_CORE_MIRRORS_COMMANDS);
 
-  mod_dir_load(mod_path, "mirrors", mod_stack.file = file_name; mirror_load(file_path));
+  mod_dir_load(mod_path, "mirrors", g_mod_stack()->file = file_name; mirror_load(file_path));
+  g_mod_stack()->file = "";
+
+  mod_dir_load(mod_path, "data", g_mod_stack()->ns = file_name; mod_loader_mod_ns_load(file_path));
 }
 
 void mod_loader_load_mods(const char* instance_dir) {
   log_info("Loading mods!");
 
-  mod_dir_load(instance_dir, "mods", mod_stack.mod = file_name; mod_loader_mod_load(file_path));
+  mod_dir_load(instance_dir, "mods", g_mod_stack()->mod = file_name; mod_loader_mod_load(file_path));
 }

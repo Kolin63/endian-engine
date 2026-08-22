@@ -14,6 +14,8 @@
 #include "mod_stack.h"
 #include "../src/fileio.h"
 
+static struct mirrors g_mirrors = {};
+
 void mirror_foreach_cleanup(struct mirror_foreach* f) {
   free(f->tag);
   mirror_strings_cleanup(&f->format);
@@ -241,7 +243,7 @@ int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) 
 }
 
 void mirror_load(const char* file_path) {
-  if (strcmp(mod_stack.file, "template.json") == 0) return;
+  if (strcmp(g_mod_stack()->file, "template.json") == 0) return;
 
   FILE* file = fopen(file_path, "r");
 
