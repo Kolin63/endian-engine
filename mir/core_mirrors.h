@@ -1,3 +1,5 @@
+// clang-format off
+
 #define ENDIAN_CORE_MIRRORS_COMMANDS "{\
   \"id\": \"commands\",\
   \"files\": [\
