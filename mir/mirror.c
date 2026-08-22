@@ -279,6 +279,7 @@ void mirror_load_from_str(const char* str) {
 
 void mirrors_cleanup(struct mirrors* arr) {
   if (arr->len == 0 || arr == NULL) return;
+  for (size_t i = 0; i < arr->len; i++) mirror_cleanup(&arr->arr[i]);
   free(arr->arr);
   arr->arr = NULL;
   arr->len = 0;
