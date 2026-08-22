@@ -6,7 +6,8 @@
 #include "jsmn_iterator.h"
 #include "json_macros.h"
 
-void mirror_strings_cleanup(struct mirror_strings* arr) {
+void
+mirror_strings_cleanup(struct mirror_strings* arr) {
   if (arr->len == 0 || arr == NULL) return;
   for (size_t i = 0; i < arr->len; i++) free(arr->arr[i]);
   free(arr->arr);
@@ -14,7 +15,8 @@ void mirror_strings_cleanup(struct mirror_strings* arr) {
   arr->len = 0;
 }
 
-int mirror_strings_from_json(struct mirror_strings* arr, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_strings_from_json(struct mirror_strings* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   arr->arr = NULL;

@@ -10,7 +10,8 @@
 #include "command.h"
 #include "log.h"
 
-void discord_application_command_options_cleanup(struct discord_application_command_options* opts) {
+void
+discord_application_command_options_cleanup(struct discord_application_command_options* opts) {
   if (opts == NULL) return;
   for (int i = 0; i < opts->size; i++) {
     discord_application_command_options_cleanup(opts->array[i].options);
@@ -20,7 +21,8 @@ void discord_application_command_options_cleanup(struct discord_application_comm
 }
 
 // converts endian command options to concord command options
-struct discord_application_command_options* command_options_end_to_conc(const struct command_options* end) {
+struct discord_application_command_options*
+command_options_end_to_conc(const struct command_options* end) {
   if (end == NULL) return NULL;
 
   struct discord_application_command_options* conc = malloc(sizeof(struct discord_application_command_options));
@@ -44,7 +46,8 @@ struct discord_application_command_options* command_options_end_to_conc(const st
   return conc;
 }
 
-void command_create(const struct command* cmd, const struct discord_ready* event) {
+void
+command_create(const struct command* cmd, const struct discord_ready* event) {
   struct discord_application_command_options* discord_opts = command_options_end_to_conc(&cmd->options);
 
   struct discord_create_global_application_command discord_params = {

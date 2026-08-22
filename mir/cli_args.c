@@ -7,16 +7,19 @@
 
 #include "log.h"
 
-void print_usage(const char* program_name) {
+void
+print_usage(const char* program_name) {
   printf("Usage: %s [-r] <instance_name>\n", program_name);
 }
 
-void cli_args_cleanup(struct cli_args* x) {
+void
+cli_args_cleanup(struct cli_args* x) {
   if (x == NULL) return;
   if (x->instance_dir != NULL) free(x->instance_dir);
 }
 
-void cli_args_parse(struct cli_args* x, int argc, const char** argv) {
+void
+cli_args_parse(struct cli_args* x, int argc, const char** argv) {
   x->default_root = true;
   x->instance_dir = NULL;
 

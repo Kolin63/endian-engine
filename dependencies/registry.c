@@ -31,9 +31,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-void registry_init(struct registry* reg, int val_size,
-                   int (*cmp)(const void*, const void*),
-                   void (*cleanup)(void*)) {
+void
+registry_init(struct registry* reg, int val_size,
+              int (*cmp)(const void*, const void*),
+              void (*cleanup)(void*)) {
   reg->length = 0;
   reg->val_size = val_size;
   reg->cmp = cmp;
@@ -41,7 +42,8 @@ void registry_init(struct registry* reg, int val_size,
   reg->vals = NULL;
 }
 
-void registry_value_cleanup(const struct registry* reg) {
+void
+registry_value_cleanup(const struct registry* reg) {
   if (reg->cleanup != NULL) {
     for (int i = 0; i < reg->length; i++) {
       reg->cleanup(registry_itov(reg, i));
@@ -50,12 +52,14 @@ void registry_value_cleanup(const struct registry* reg) {
   free(reg->vals);
 }
 
-void registry_cleanup(struct registry* reg) {
+void
+registry_cleanup(struct registry* reg) {
   registry_value_cleanup(reg);
 }
 
-int registry_safe_cmp(const struct registry* reg, const void* a,
-                      const void* b) {
+int
+registry_safe_cmp(const struct registry* reg, const void* a,
+                  const void* b) {
   if (a == b) return 0;
   else if (a == NULL || b == NULL) {
     if (a > b) return 1;
@@ -64,7 +68,8 @@ int registry_safe_cmp(const struct registry* reg, const void* a,
   return reg->cmp(a, b);
 }
 
-void* registry_add(struct registry* reg, const void* val) {
+void*
+registry_add(struct registry* reg, const void* val) {
   // do a binary search to find insertion index
   // 0 2 4 6 8
   //       ^
@@ -111,7 +116,8 @@ void* registry_add(struct registry* reg, const void* val) {
   return registry_itov(reg, insert_index);
 }
 
-int registry_del(struct registry* reg, int i, void* val) {
+int
+registry_del(struct registry* reg, int i, void* val) {
   int next_len = reg->length - i - 1;
   if (next_len > 0) {
     const void* next = registry_itov(reg, i + 1);
@@ -129,34 +135,40 @@ int registry_del(struct registry* reg, int i, void* val) {
   return 0;
 }
 
-int registry_del_val(struct registry* reg, void* val) {
+int
+registry_del_val(struct registry* reg, void* val) {
   int i = registry_vtoi(reg, val);
   return registry_del(reg, i, val);
 }
 
-int registry_del_key(struct registry* reg, const void* key) {
+int
+registry_del_key(struct registry* reg, const void* key) {
   int i = registry_ktoi(reg, key);
   if (i == -1) return -1;
   void* val = registry_itov(reg, i);
   return registry_del(reg, i, val);
 }
 
-int registry_del_i(struct registry* reg, int i) {
+int
+registry_del_i(struct registry* reg, int i) {
   void* val = registry_itov(reg, i);
   return registry_del(reg, i, val);
 }
 
-void registry_clear(struct registry* reg) {
+void
+registry_clear(struct registry* reg) {
   registry_value_cleanup(reg);
   reg->vals = NULL;
   reg->length = 0;
 }
 
-void* registry_itov(const struct registry* reg, int i) {
+void*
+registry_itov(const struct registry* reg, int i) {
   return reg->vals + i * reg->val_size;
 }
 
-void* registry_itov_safe(const struct registry* reg, int i) {
+void*
+registry_itov_safe(const struct registry* reg, int i) {
   if (i < 0 || i >= reg->length) {
     return NULL;
   } else {
@@ -164,7 +176,8 @@ void* registry_itov_safe(const struct registry* reg, int i) {
   }
 }
 
-int registry_ktoi(const struct registry* reg, const void* key) {
+int
+registry_ktoi(const struct registry* reg, const void* key) {
   int left = 0;
   int right = reg->length - 1;
   while (left <= right) {
@@ -181,17 +194,20 @@ int registry_ktoi(const struct registry* reg, const void* key) {
   return -1;
 }
 
-void* registry_ktov(const struct registry* reg, const void* key) {
+void*
+registry_ktov(const struct registry* reg, const void* key) {
   int i = registry_ktoi(reg, key);
   if (i < 0) return NULL;
   return registry_itov(reg, i);
 }
 
-int registry_vtoi(const struct registry* reg, const void* val) {
+int
+registry_vtoi(const struct registry* reg, const void* val) {
   return (val - reg->vals) / reg->val_size;
 }
 
-int registry_strcmp(const char* a, const char* b) {
+int
+registry_strcmp(const char* a, const char* b) {
   while (1) {
     if (*a > *b) return 1;
     else if (*a < *b) return -1;

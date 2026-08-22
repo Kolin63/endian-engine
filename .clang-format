@@ -8,3 +8,4 @@ AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 SortIncludes:
   Enabled: False
 AllowShortEnumsOnASingleLine: True
+BreakAfterReturnType: AllDefinitions

@@ -11,8 +11,9 @@
 #include "log.h"
 #include "../ref/instance_dir.h"
 
-int save_write(const char* ns, const char* dir, const char* file,
-               const char* ext, const char* content) {
+int
+save_write(const char* ns, const char* dir, const char* file,
+           const char* ext, const char* content) {
   char* path = malloc(strlen(INSTANCE_DIR) + 6 + strlen(ns) +
                       1 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
   strcat(path, INSTANCE_DIR "/saves/");
@@ -56,8 +57,9 @@ int save_write(const char* ns, const char* dir, const char* file,
 }
 
 // predir should be "saves" or "mods/modname/data/rom"
-int save_or_rom_read(const char* predir, const char* ns, const char* dir,
-                     const char* file, const char* ext, char** out) {
+int
+save_or_rom_read(const char* predir, const char* ns, const char* dir,
+                 const char* file, const char* ext, char** out) {
   char* path = malloc(strlen(INSTANCE_DIR) + 1 +
                       strlen(predir) + 1 + strlen(ns) + 1 + strlen(dir) + 1 +
                       strlen(file) + 1 + strlen(ext) + 1);
@@ -104,7 +106,8 @@ int save_or_rom_read(const char* predir, const char* ns, const char* dir,
   return 0;
 }
 
-int save_read(const char* ns, const char* dir, const char* file,
-              const char* ext, char** out) {
+int
+save_read(const char* ns, const char* dir, const char* file,
+          const char* ext, char** out) {
   return save_or_rom_read("saves", ns, dir, file, ext, out);
 }

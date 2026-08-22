@@ -21,7 +21,8 @@ static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_mutex_t on_ready_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void log_lock_func(bool lock, void* udata) {
+void
+log_lock_func(bool lock, void* udata) {
   if (lock == true) {
     pthread_mutex_lock(&log_lock);
   } else {
@@ -29,7 +30,8 @@ void log_lock_func(bool lock, void* udata) {
   }
 }
 
-void on_ready(struct discord*, const struct discord_ready* event) {
+void
+on_ready(struct discord*, const struct discord_ready* event) {
   pthread_mutex_lock(&on_ready_lock);
 
   if (get_cleanup_ready() == 1) {
@@ -46,7 +48,8 @@ void on_ready(struct discord*, const struct discord_ready* event) {
   pthread_mutex_unlock(&on_ready_lock);
 }
 
-void on_interaction(struct discord* client, const struct discord_interaction* event) {
+void
+on_interaction(struct discord* client, const struct discord_interaction* event) {
   if (event->type != DISCORD_INTERACTION_APPLICATION_COMMAND)
     return;  // return if interaction isn't a slash command
 
@@ -63,7 +66,8 @@ void on_interaction(struct discord* client, const struct discord_interaction* ev
   command_cb(cmd_id, client, event);
 }
 
-void bot_init() {
+void
+bot_init() {
   if (global_bot != NULL) {
     log_error("Global Bot already initialized");
     return;
@@ -140,11 +144,14 @@ void bot_init() {
   discord_set_on_interaction_create(global_bot->discord_bot, &on_interaction);
 }
 
-void bot_cleanup() {
+void
+bot_cleanup() {
   fclose(log_file);
   free(global_bot);
 }
 
-struct bot* bot_get_global() { return global_bot; }
+struct bot*
+bot_get_global() { return global_bot; }
 
-void bot_start() { discord_run(global_bot->discord_bot); }
+void
+bot_start() { discord_run(global_bot->discord_bot); }

@@ -11,7 +11,8 @@
 
 #define LINE_BUF_SIZE 65536
 
-char* fileio_read_all(FILE* file) {
+char*
+fileio_read_all(FILE* file) {
   char* buf = malloc(1);
   buf[0] = '\0';
   size_t buf_size = 1;
@@ -25,7 +26,8 @@ char* fileio_read_all(FILE* file) {
   return buf;
 }
 
-jsmntok_t* fileio_read_json(const char* json) {
+jsmntok_t*
+fileio_read_json(const char* json) {
   size_t json_len = strlen(json);
 
   jsmn_parser parser;

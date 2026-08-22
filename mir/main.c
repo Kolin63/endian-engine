@@ -2,7 +2,8 @@
 #include "mirror.h"
 #include "mod_loader.h"
 
-int main(const int argc, const char** argv) {
+int
+main(const int argc, const char** argv) {
   struct cli_args cli_args;
   cli_args_parse(&cli_args, argc, argv);
 

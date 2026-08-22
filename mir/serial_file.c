@@ -10,7 +10,8 @@
 
 #define LINE_BUF_SIZE 65536
 
-void serial_file_tag_cleanup(struct serial_file_tag* x) {
+void
+serial_file_tag_cleanup(struct serial_file_tag* x) {
   if (x == NULL) return;
   if (x->id != NULL) free(x->id);
   mirror_strings_cleanup(&x->data);
@@ -19,7 +20,8 @@ void serial_file_tag_cleanup(struct serial_file_tag* x) {
 
 // replaces closing parenthesis with null terminator and returns pointer
 // to the first character after the opening parenthesis
-char* serial_file_tag_get_param(char* line) {
+char*
+serial_file_tag_get_param(char* line) {
   char* start = NULL;
   for (char* i = line; *i != '\0'; i++) {
     if (*i == '(') {
@@ -31,14 +33,16 @@ char* serial_file_tag_get_param(char* line) {
   return start;
 }
 
-void serial_file_tags_cleanup(struct serial_file_tags* x) {
+void
+serial_file_tags_cleanup(struct serial_file_tags* x) {
   if (x == NULL) return;
   for (size_t i = 0; i < x->len; i++) {
     serial_file_tag_cleanup(&x->arr[i]);
   }
 }
 
-int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
+int
+serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
   int error = 0;
 
   char* line = malloc(LINE_BUF_SIZE);
@@ -59,7 +63,6 @@ int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
       if (tag_id != NULL) free(tag_id);
       continue;
     }
-
 
     buf = malloc(1);
     size_t buf_size = 1;
@@ -100,12 +103,14 @@ int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
   return error;
 }
 
-void serial_file_cleanup(struct serial_file* x) {
+void
+serial_file_cleanup(struct serial_file* x) {
   if (x == NULL) return;
   serial_file_tags_cleanup(&x->tags);
 }
 
-void serial_file_load(struct serial_file* s, const char* file_path) {
+void
+serial_file_load(struct serial_file* s, const char* file_path) {
   if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
 
   FILE* file = fopen(file_path, "r");
@@ -125,7 +130,8 @@ void serial_file_load(struct serial_file* s, const char* file_path) {
   log_info("Serializing file %s", mod_stack_global()->file);
 }
 
-void serial_files_cleanup(struct serial_files* x) {
+void
+serial_files_cleanup(struct serial_files* x) {
   if (x == NULL) return;
   for (size_t i = 0; i < x->len; i++) {
     serial_file_cleanup(&x->arr[i]);

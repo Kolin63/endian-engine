@@ -96,7 +96,8 @@
             {\
               \"tag\": \"command_cb\",\
               \"format\": [\
-                \"void %n_%d_cb(struct discord* client, const struct discord_interaction* event) %s\",\
+                \"void\",\
+                \"%n_%d_cb(struct discord* client, const struct discord_interaction* event) %s\",\
                 \"\"\
               ]\
             }\
@@ -106,7 +107,8 @@
 \
         {\
           \"prefix\": [\
-            \"enum command_id command_id_get(const char* str) {\"\
+            \"enum command_id\",\
+            \"command_id_get(const char* str) {\"\
           ],\
           \"foreach\": [\
             {\
@@ -125,7 +127,8 @@
 \
         {\
           \"prefix\": [\
-            \"void command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event) {\",\
+            \"void\",\
+            \"command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event) {\",\
             \"  switch (id) {\"\
           ],\
           \"foreach\": [\
@@ -145,7 +148,8 @@
 \
         {\
           \"prefix\": [\
-            \"void command_create_all(const struct discord_ready* event) {\"\
+            \"void\",\
+            \"command_create_all(const struct discord_ready* event) {\"\
           ],\
           \"foreach\": [\
             {\

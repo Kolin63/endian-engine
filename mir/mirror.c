@@ -16,12 +16,14 @@
 
 static struct mirrors global = {};
 
-void mirror_foreach_cleanup(struct mirror_foreach* f) {
+void
+mirror_foreach_cleanup(struct mirror_foreach* f) {
   free(f->tag);
   mirror_strings_cleanup(&f->format);
 }
 
-int mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   f->tag = NULL;
@@ -49,7 +51,8 @@ int mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, co
   return error;
 }
 
-void mirror_foreach_arr_cleanup(struct mirror_foreach_arr* arr) {
+void
+mirror_foreach_arr_cleanup(struct mirror_foreach_arr* arr) {
   if (arr->len == 0 || arr == NULL) return;
   for (size_t i = 0; i < arr->len; i++) mirror_foreach_cleanup(&arr->arr[i]);
   free(arr->arr);
@@ -57,7 +60,8 @@ void mirror_foreach_arr_cleanup(struct mirror_foreach_arr* arr) {
   arr->len = 0;
 }
 
-int mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   arr->arr = NULL;
@@ -77,14 +81,16 @@ int mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t
   return error;
 }
 
-void mirror_group_cleanup(struct mirror_group* g) {
+void
+mirror_group_cleanup(struct mirror_group* g) {
   if (g == NULL) return;
   mirror_strings_cleanup(&g->prefix);
   mirror_foreach_arr_cleanup(&g->foreach);
   mirror_strings_cleanup(&g->postfix);
 }
 
-int mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   g->prefix.arr = NULL;
@@ -118,7 +124,8 @@ int mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const 
   return error;
 }
 
-void mirror_groups_cleanup(struct mirror_groups* arr) {
+void
+mirror_groups_cleanup(struct mirror_groups* arr) {
   if (arr->len == 0 || arr == NULL) return;
   for (size_t i = 0; i < arr->len; i++) mirror_group_cleanup(&arr->arr[i]);
   free(arr->arr);
@@ -126,7 +133,8 @@ void mirror_groups_cleanup(struct mirror_groups* arr) {
   arr->len = 0;
 }
 
-int mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   arr->arr = NULL;
@@ -146,13 +154,15 @@ int mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, co
   return error;
 }
 
-void mirror_file_cleanup(struct mirror_file* f) {
+void
+mirror_file_cleanup(struct mirror_file* f) {
   if (f == NULL) return;
   free(f->name);
   mirror_groups_cleanup(&f->groups);
 }
 
-int mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   f->name = NULL;
@@ -180,7 +190,8 @@ int mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const ch
   return error;
 }
 
-void mirror_files_cleanup(struct mirror_files* arr) {
+void
+mirror_files_cleanup(struct mirror_files* arr) {
   if (arr->len == 0 || arr == NULL) return;
   for (size_t i = 0; i < arr->len; i++) mirror_file_cleanup(&arr->arr[i]);
   free(arr->arr);
@@ -188,7 +199,8 @@ void mirror_files_cleanup(struct mirror_files* arr) {
   arr->len = 0;
 }
 
-int mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   arr->arr = NULL;
@@ -208,13 +220,15 @@ int mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, cons
   return error;
 }
 
-void mirror_cleanup(struct mirror* m) {
+void
+mirror_cleanup(struct mirror* m) {
   if (m == NULL) return;
   if (m->id != NULL) free(m->id);
   mirror_files_cleanup(&m->files);
 }
 
-int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) {
+int
+mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
 
   m->id = NULL;
@@ -242,7 +256,8 @@ int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) 
   return error;
 }
 
-void mirror_load(const char* file_path) {
+void
+mirror_load(const char* file_path) {
   if (strcmp(mod_stack_global()->file, "template.json") == 0) return;
 
   FILE* file = fopen(file_path, "r");
@@ -259,7 +274,8 @@ void mirror_load(const char* file_path) {
   free(json);
 }
 
-void mirror_load_from_str(const char* str) {
+void
+mirror_load_from_str(const char* str) {
   jsmntok_t* jsmn = fileio_read_json(str);
 
   struct mirror m;
@@ -277,7 +293,8 @@ void mirror_load_from_str(const char* str) {
   log_info("Loading mirror %s", m.id);
 }
 
-void mirrors_cleanup(struct mirrors* arr) {
+void
+mirrors_cleanup(struct mirrors* arr) {
   if (arr->len == 0 || arr == NULL) return;
   for (size_t i = 0; i < arr->len; i++) mirror_cleanup(&arr->arr[i]);
   free(arr->arr);
@@ -285,6 +302,7 @@ void mirrors_cleanup(struct mirrors* arr) {
   arr->len = 0;
 }
 
-struct mirrors* mirrors_global() {
+struct mirrors*
+mirrors_global() {
   return &global;
 }

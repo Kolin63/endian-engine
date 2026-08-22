@@ -34,7 +34,8 @@
 #define JSMN_HEADER
 #include <concord/jsmn.h>
 
-void jsmn_iterator_get_string(char* buf, unsigned long size, const char* json, const jsmntok_t* tok) {
+void
+jsmn_iterator_get_string(char* buf, unsigned long size, const char* json, const jsmntok_t* tok) {
   unsigned long len = tok->end - tok->start + 1;
   if (len > size) len = size;
   for (unsigned long i = 0; i < len - 1; i++) {
@@ -43,14 +44,16 @@ void jsmn_iterator_get_string(char* buf, unsigned long size, const char* json, c
   buf[len - 1] = '\0';
 }
 
-char* jsmn_iterator_get_string_heap(const char* json, const jsmntok_t* tok) {
+char*
+jsmn_iterator_get_string_heap(const char* json, const jsmntok_t* tok) {
   const unsigned long len = tok->end - tok->start + 1;
   char* str = malloc(len);
   jsmn_iterator_get_string(str, len, json, tok);
   return str;
 }
 
-const char* jsmn_iterator_type_to_str(jsmntype_t type) {
+const char*
+jsmn_iterator_type_to_str(jsmntype_t type) {
   switch (type) {
   case (JSMN_UNDEFINED):
     return "JSMN_UNDEFINED";
@@ -66,7 +69,8 @@ const char* jsmn_iterator_type_to_str(jsmntype_t type) {
   return "ERROR - NOT A TYPE";
 }
 
-int jsmn_iterator_get_size_recursive(const jsmntok_t* root) {
+int
+jsmn_iterator_get_size_recursive(const jsmntok_t* root) {
   int size = 0;
   const jsmntok_t* tok = root + 1;
 
@@ -78,7 +82,8 @@ int jsmn_iterator_get_size_recursive(const jsmntok_t* root) {
   return size;
 }
 
-void jsmn_iterator_init(struct jsmn_iterator* iter, const jsmntok_t* root, const char* json) {
+void
+jsmn_iterator_init(struct jsmn_iterator* iter, const jsmntok_t* root, const char* json) {
   iter->i = 0;
   iter->key = NULL;
   iter->val = root;
@@ -87,7 +92,8 @@ void jsmn_iterator_init(struct jsmn_iterator* iter, const jsmntok_t* root, const
   iter->json = json;
 }
 
-int jsmn_iterator_next(struct jsmn_iterator* iter) {
+int
+jsmn_iterator_next(struct jsmn_iterator* iter) {
   if (iter->key != NULL) {
     free(iter->key);
     iter->key = NULL;

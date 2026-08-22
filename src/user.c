@@ -23,15 +23,18 @@ enum user_init_status {
 static enum user_init_status user_init_status = USER_INIT_STATUS_IDLE;
 static pthread_rwlock_t user_lock = PTHREAD_RWLOCK_INITIALIZER;
 
-void user_init_done(struct discord* client, struct discord_response* resp, const struct discord_user* ret) {
+void
+user_init_done(struct discord* client, struct discord_response* resp, const struct discord_user* ret) {
   user_init_status = USER_INIT_STATUS_DONE;
 }
 
-void user_init_fail(struct discord* client, struct discord_response* resp) {
+void
+user_init_fail(struct discord* client, struct discord_response* resp) {
   user_init_status = USER_INIT_STATUS_FAIL;
 }
 
-struct user* user_init(unsigned long uuid) {
+struct user*
+user_init(unsigned long uuid) {
   pthread_rwlock_wrlock(&user_lock);
 
   while (user_init_status != USER_INIT_STATUS_IDLE);
@@ -86,7 +89,8 @@ struct user* user_init(unsigned long uuid) {
   return user;
 }
 
-struct user* user_get(unsigned long uuid) {
+struct user*
+user_get(unsigned long uuid) {
   pthread_rwlock_rdlock(&user_lock);
   struct user* key = &(struct user){.uuid = uuid};
   struct user** ret_ptr = registry_ktov(regman_get_user(), &key);
@@ -98,7 +102,8 @@ struct user* user_get(unsigned long uuid) {
   return *ret_ptr;
 }
 
-int user_cmp(struct user* const* a, struct user* const* b) {
+int
+user_cmp(struct user* const* a, struct user* const* b) {
   const struct user* x = *a;
   const struct user* y = *b;
 
@@ -111,17 +116,20 @@ int user_cmp(struct user* const* a, struct user* const* b) {
   return 0;
 }
 
-void user_cleanup(struct user** elem) {
+void
+user_cleanup(struct user** elem) {
   struct user* user = *elem;
   free(user->username);
   free(user->avatar);
   free(user);
 }
 
-void uuid_to_string(unsigned long uuid, char* buf) {
+void
+uuid_to_string(unsigned long uuid, char* buf) {
   snprintf(buf, UUID_STR_LEN, "%zi", uuid);
 }
 
-unsigned long string_to_uuid(const char* str) {
+unsigned long
+string_to_uuid(const char* str) {
   return strtoul(str, NULL, 10);
 }
