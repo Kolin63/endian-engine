@@ -23,12 +23,12 @@ char* serial_file_tag_get_param(char* line) {
   char* start = NULL;
   for (char* i = line; *i != '\0'; i++) {
     if (*i == '(') {
-      start = i;
+      start = i + 1;
     } else if (*i == ')') {
       *i = '\0';
-      return start;
     }
   }
+  return start;
 }
 
 void serial_file_tags_cleanup(struct serial_file_tags* x) {
