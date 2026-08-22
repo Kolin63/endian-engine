@@ -11,7 +11,7 @@ set_target_properties(concord PROPERTIES
 
 project(reflector C)
 
-file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/save.c" "src/fileio.c")
+file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/fileio.c")
 
 add_executable(reflector ${REFLECTOR_SRC})
 
