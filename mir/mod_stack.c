@@ -6,4 +6,4 @@ static struct mod_stack mod_stack = {
     .file = "",
 };
 
-struct mod_stack* g_mod_stack() { return &mod_stack; }
+struct mod_stack* mod_stack_global() { return &mod_stack; }

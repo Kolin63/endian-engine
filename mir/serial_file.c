@@ -106,7 +106,7 @@ void serial_file_cleanup(struct serial_file* x) {
 }
 
 void serial_file_load(struct serial_file* s, const char* file_path) {
-  if (strncmp(g_mod_stack()->file, "template.", 9) == 0) return;
+  if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
 
   FILE* file = fopen(file_path, "r");
 
@@ -122,7 +122,7 @@ void serial_file_load(struct serial_file* s, const char* file_path) {
 
   fclose(file);
 
-  log_info("Serializing file %s", g_mod_stack()->file);
+  log_info("Serializing file %s", mod_stack_global()->file);
 }
 
 void serial_files_cleanup(struct serial_files* x) {

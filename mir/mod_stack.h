@@ -7,9 +7,9 @@ struct mod_stack {
   const char* file;
 };
 
-struct mod_stack* g_mod_stack();
+struct mod_stack* mod_stack_global();
 
 #define MOD_STACK_FMT "%s:%s:%s "
-#define MOD_STACK_ARG g_mod_stack()->mod, g_mod_stack()->ns, g_mod_stack()->file
+#define MOD_STACK_ARG mod_stack_global()->mod, mod_stack_global()->ns, mod_stack_global()->file
 
 #endif

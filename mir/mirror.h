@@ -49,8 +49,6 @@ struct mirrors {
   size_t len;
 };
 
-static struct mirrors mirrors = {};
-
 void mirror_foreach_cleanup(struct mirror_foreach* f);
 int mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json);
 
@@ -75,5 +73,6 @@ void mirror_load(const char* file_path);
 void mirror_load_from_str(const char* str);
 
 void mirrors_cleanup(struct mirrors* arr);
+struct mirrors* mirrors_global();
 
 #endif
