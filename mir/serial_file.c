@@ -33,7 +33,7 @@ char* serial_file_tag_get_param(char* line) {
 
 void serial_file_tags_cleanup(struct serial_file_tags* x) {
   if (x == NULL) return;
-  for (size_t i = 0; i < x->len; x++) {
+  for (size_t i = 0; i < x->len; i++) {
     serial_file_tag_cleanup(&x->arr[i]);
   }
 }
