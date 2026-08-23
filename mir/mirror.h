@@ -8,9 +8,30 @@
 
 #include "mirror_strings.h"
 
+enum mirror_format_block_type {
+  MFBT_NULL,
+  MFBT_CONST,
+  MFBT_TAG_CONTENT,   // %t
+  MFBT_DATA,          // %d
+  MFBT_DATA_CAPS,     // %D
+  MFBT_NS,            // %n
+  MFBT_NS_CAPS,       // %N
+  MFBT_ALPHA_SWITCH,  // %A
+};
+
+struct mirror_format_block {
+  enum mirror_format_block_type type;
+  struct mirror_strings buf;
+};
+
+struct mirror_format_blocks {
+  struct mirror_format_block* arr;
+  size_t len;
+};
+
 struct mirror_foreach {
   char* tag;
-  struct mirror_strings format;
+  struct mirror_format_blocks format;
 };
 
 struct mirror_foreach_arr {
@@ -48,6 +69,11 @@ struct mirrors {
   struct mirror* arr;
   size_t len;
 };
+
+void mirror_format_block_cleanup(struct mirror_format_block* f);
+
+void mirror_format_blocks_cleanup(struct mirror_format_blocks* f);
+int mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* jsmn, const char* json);
 
 void mirror_foreach_cleanup(struct mirror_foreach* f);
 int mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json);

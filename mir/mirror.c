@@ -17,9 +17,133 @@
 static struct mirrors global = {};
 
 void
+mirror_format_block_cleanup(struct mirror_format_block* f) {
+  if (f == NULL) return;
+  mirror_strings_cleanup(&f->buf);
+}
+
+void
+mirror_format_blocks_cleanup(struct mirror_format_blocks* f) {
+  if (f == NULL || f->arr == NULL || f->len == 0) return;
+  for (size_t i = 0; i < f->len; i++) {
+    mirror_format_block_cleanup(&f->arr[i]);
+  }
+  free(f->arr);
+}
+
+int
+mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* jsmn, const char* json) {
+  int error = 0;
+
+  struct jsmn_iterator iter;
+  jsmn_iterator_init(&iter, jsmn, json);
+
+  END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
+
+  f->len = 1;
+  f->arr = malloc(sizeof(struct mirror_format_block));
+  struct mirror_format_block* current_block = &f->arr[0];
+  current_block->type = MFBT_NULL;
+  current_block->buf.arr = NULL;
+  current_block->buf.len = 0;
+
+  while (jsmn_iterator_next(&iter)) {
+    END_JSON_CHECK_STRING(iter);
+    char* line = jsmn_iterator_get_string_heap(json, iter.val);
+    const size_t linelen = strlen(line);
+
+    bool escape = false;
+
+    for (size_t i = 0; i < linelen; i++) {
+      if (line[i] == '%') {
+        if (escape == true) {
+          escape = false;
+        } else {
+          escape = true;
+          continue;
+        }
+      }
+
+      if (escape == true) {
+        escape = false;
+        enum mirror_format_block_type type;
+        switch (line[i]) {
+        case 't':
+          type = MFBT_TAG_CONTENT;
+          break;
+        case 'd':
+          type = MFBT_DATA;
+          break;
+        case 'D':
+          type = MFBT_DATA_CAPS;
+          break;
+        case 'n':
+          type = MFBT_NS;
+          break;
+        case 'N':
+          type = MFBT_NS_CAPS;
+          break;
+        case 'A':
+          type = MFBT_ALPHA_SWITCH;
+          break;
+        default:
+          log_error(MOD_STACK_FMT "unknown escape sequence %%%c", MOD_STACK_ARG, line[i]);
+          error++;
+          continue;
+        }
+        if (current_block->type != MFBT_NULL) {
+          f->len++;
+          f->arr = realloc(f->arr, f->len * sizeof(struct mirror_format_block));
+          current_block = &f->arr[f->len - 1];
+        }
+        current_block->type = type;
+        current_block->buf.len = 0;
+        current_block->buf.arr = NULL;
+
+        continue;
+      }
+
+      // at this point we are sure the text is of type CONST
+
+      if (current_block->type != MFBT_CONST) {
+        if (current_block->type != MFBT_NULL) {
+          f->len++;
+          f->arr = realloc(f->arr, f->len * sizeof(struct mirror_format_block));
+          current_block = &f->arr[f->len - 1];
+        }
+        current_block->type = MFBT_CONST;
+        current_block->buf.len = 0;
+        current_block->buf.arr = NULL;
+      }
+
+      if (current_block->buf.arr == NULL || current_block->buf.len == 0) {
+        current_block->buf.len = 1;
+        current_block->buf.arr = malloc(sizeof(char*));
+        current_block->buf.arr[0] = malloc(linelen + 1);
+        current_block->buf.arr[0][0] = '\0';
+      }
+
+      char charstr[2] = {line[i], '\0'};
+      char* bufstr = current_block->buf.arr[current_block->buf.len - 1];
+      strcat(bufstr, charstr);
+    }
+
+    free(line);
+
+    if (current_block->type == MFBT_CONST) {
+      current_block->buf.len++;
+      current_block->buf.arr = realloc(current_block->buf.arr, current_block->buf.len * sizeof(char*));
+      current_block->buf.arr[current_block->buf.len - 1] = NULL;
+    }
+  }
+
+  return error;
+}
+
+void
 mirror_foreach_cleanup(struct mirror_foreach* f) {
   free(f->tag);
-  mirror_strings_cleanup(&f->format);
+  mirror_format_blocks_cleanup(&f->format);
 }
 
 int
@@ -41,7 +165,7 @@ mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const 
       f->tag = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "format") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      error += mirror_strings_from_json(&f->format, iter.val, json);
+      error += mirror_format_blocks_from_json(&f->format, iter.val, json);
     } else {
       error++;
       log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);
