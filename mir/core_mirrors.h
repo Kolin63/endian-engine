@@ -45,7 +45,7 @@
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  [COMMAND_%D] = %s\"\
+                \"  [COMMAND_%D] = %t\"\
               ]\
             }\
           ],\
@@ -97,7 +97,7 @@
               \"tag\": \"command_cb\",\
               \"format\": [\
                 \"void\",\
-                \"%n_%d_cb(struct discord* client, const struct discord_interaction* event) %s\",\
+                \"%n_%d_cb(struct discord* client, const struct discord_interaction* event) %t\",\
                 \"\"\
               ]\
             }\
@@ -114,7 +114,13 @@
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  %A:%d:return COMMAND_%D;:return COMMAND_UNKNOWN_;\"\
+                \"%A\",\
+                \"%d\",\
+                \"%A\",\
+                \"    return COMMAND_%D\",\
+                \"%A\",\
+                \"    return COMMAND_UNKNOWN_;\",\
+                \"%A\"\
               ]\
             }\
           ],\
