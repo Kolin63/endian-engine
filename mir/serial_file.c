@@ -117,6 +117,9 @@ void
 serial_file_load(struct serial_file* s, const char* file_path) {
   if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
 
+  s->tags.arr = NULL;
+  s->tags.len = 0;
+
   FILE* file = fopen(file_path, "r");
 
   if (!file) {
