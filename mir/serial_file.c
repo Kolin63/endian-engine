@@ -61,7 +61,6 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
       strcpy(tag_id, str);
       if (tag_id[0] == '\0') log_warn(MOD_STACK_FMT "mirror tag has no id", MOD_STACK_ARG);
     } else {
-      if (tag_id != NULL) free(tag_id);
       continue;
     }
 
