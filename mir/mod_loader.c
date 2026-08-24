@@ -11,6 +11,7 @@
 #include "../src/fileio.h"
 #include "serial_file.h"
 #include "reflection.h"
+#include "write_instance_dir.h"
 
 #define mod_dir_load(pre_path, path, func)                            \
   {                                                                   \
@@ -77,5 +78,6 @@ void
 mod_loader_load_mods(const char* instance_dir) {
   log_info("Loading mods!");
 
+  write_instance_dir(instance_dir);
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(file_path));
 }
