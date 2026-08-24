@@ -206,6 +206,8 @@ reflection_file_write(const struct reflection_file* ref) {
 
   fclose(file);
 
+  log_info("Generating file %s", ref->name);
+
   return error;
 }
 
