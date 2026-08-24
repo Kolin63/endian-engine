@@ -34,9 +34,10 @@ enum command_id;
 
 const static struct command commands[];
 
-static void command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event);
-static void command_create_all(const struct discord_ready* event);
-static enum command_id command_id_get(const char* str);
+void command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event);
+void command_create(const struct command* cmd, const struct discord_ready* event);
+void command_create_all(const struct discord_ready* event);
+enum command_id command_id_get(const char* str);
 
 #include "../ref/commands.h"
 

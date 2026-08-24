@@ -56,7 +56,7 @@
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"[COMMAND_%D] = %t\"\
+                \"[COMMAND_%D] = %t,\"\
               ]\
             }\
           ],\
@@ -173,7 +173,7 @@
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  command_create(commands[COMMAND_%D], event);\"\
+                \"  command_create(&commands[COMMAND_%D], event);\"\
               ]\
             }\
           ],\
