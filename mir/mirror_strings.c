@@ -8,8 +8,8 @@
 
 void
 mirror_strings_cleanup(struct mirror_strings* arr) {
-  if (arr->len == 0 || arr == NULL) return;
-  for (size_t i = 0; i < arr->len; i++) free(arr->arr[i]);
+  if (arr == NULL || arr->len == 0 || arr->arr == NULL) return;
+  for (size_t i = 0; i < arr->len; i++) if (arr->arr[i] != NULL) free(arr->arr[i]);
   free(arr->arr);
   arr->arr = NULL;
   arr->len = 0;
