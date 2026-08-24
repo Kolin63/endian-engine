@@ -39,18 +39,19 @@
 \
         {\
           \"prefix\": [\
-            \"const static struct command[] commands = {\"\
+            \"const static struct command commands[] = {\",\
+            \"\"\
           ],\
           \"foreach\": [\
             {\
               \"tag\": \"command\",\
               \"format\": [\
-                \"  [COMMAND_%D] = %t\"\
+                \"[COMMAND_%D] = %t\"\
               ]\
             }\
           ],\
           \"postfix\": [\
-            \"}\",\
+            \"};\",\
             \"\"\
           ]\
         },\
@@ -86,7 +87,8 @@
       \"groups\": [\
         {\
           \"prefix\": [\
-            \"#include \\\"commands.h\\\"\"\
+            \"#include \\\"commands.h\\\"\",\
+            \"\"\
           ]\
         },\
 \
@@ -97,8 +99,7 @@
               \"tag\": \"command_cb\",\
               \"format\": [\
                 \"void\",\
-                \"%n_%d_cb(struct discord* client, const struct discord_interaction* event) %t\",\
-                \"\"\
+                \"%n_%d_cb(struct discord* client, const struct discord_interaction* event) %t\"\
               ]\
             }\
           ]\
@@ -115,11 +116,11 @@
               \"tag\": \"command\",\
               \"format\": [\
                 \"%A\",\
-                \"%d\",\
+                \"// %d\",\
                 \"%A\",\
-                \"    return COMMAND_%D\",\
+                \"    // return COMMAND_%D\",\
                 \"%A\",\
-                \"    return COMMAND_UNKNOWN_;\",\
+                \"    // return COMMAND_UNKNOWN_;\",\
                 \"%A\"\
               ]\
             }\
@@ -147,7 +148,8 @@
           ],\
           \"postfix\": [\
             \"  }\",\
-            \"}\"\
+            \"}\",\
+            \"\"\
           ]\
         },\
 \
