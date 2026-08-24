@@ -8,7 +8,7 @@
 
 struct serial_file_tag {
   char* id;
-  struct mirror_strings data;
+  char* data;
   char* buf;
 };
 

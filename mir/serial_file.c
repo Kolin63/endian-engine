@@ -14,7 +14,7 @@ void
 serial_file_tag_cleanup(struct serial_file_tag* x) {
   if (x == NULL) return;
   if (x->id != NULL) free(x->id);
-  mirror_strings_cleanup(&x->data);
+  if (x->data != NULL) free(x->data);
   if (x->buf != NULL) free(x->buf);
 }
 
@@ -50,7 +50,7 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
 
   while (1) {
     char* tag_id = NULL;
-    struct mirror_strings data = {};
+    char* data = NULL;
     char* buf;
 
     if (fgets(line, LINE_BUF_SIZE, file) == NULL) break;
@@ -77,18 +77,21 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
         break;
       } else if (strncmp(line, "ENDIAN_MIRROR_TAG_DATA(", 23) == 0) {
         const char* str = serial_file_tag_get_param(line);
+        if (data != NULL) {
+          log_warn(MOD_STACK_FMT "overriding previous tag data", MOD_STACK_ARG);
+          free(data);
+        }
         if (str[0] == '\0') log_warn(MOD_STACK_FMT "empty tag data", MOD_STACK_ARG);
-        char* heap = malloc(strlen(str) + 1);
-        strcpy(heap, str);
-        data.len++;
-        data.arr = realloc(data.arr, data.len * sizeof(char*));
-        data.arr[data.len - 1] = heap;
+        data = malloc(strlen(str) + 1);
+        strcpy(data, str);
       } else {
         buf_size += strlen(line);
         buf = realloc(buf, buf_size);
         strcat(buf, line);
       }
     }
+
+    if (data == NULL) data = "";
 
     tags->len++;
     tags->arr = realloc(tags->arr, tags->len * sizeof(struct serial_file_tag));
