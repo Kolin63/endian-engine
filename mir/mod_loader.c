@@ -66,6 +66,7 @@ mod_loader_mod_load(const char* mod_path) {
   log_info("Loading mod %s", mod_stack_global()->mod);
 
   mod_stack_global()->file = "core_mirrors.h";
+  mirror_load_from_str(ENDIAN_CORE_MIRRORS_FUNCTIONS);
   mirror_load_from_str(ENDIAN_CORE_MIRRORS_COMMANDS);
 
   mod_dir_load(mod_path, "mirrors", mod_stack_global()->file = file_name; mirror_load(file_path));

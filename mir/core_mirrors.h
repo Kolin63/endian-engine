@@ -1,5 +1,137 @@
 // clang-format off
 
+#define ENDIAN_CORE_MIRRORS_FUNCTIONS "{\
+  \"id\": \"functions\",\
+  \"files\": [\
+    {\
+      \"name\": \"functions.h\",\
+      \"groups\": [\
+        {\
+          \"prefix\": [\
+            \"#ifndef ENDIAN_REFLECTIONS_FUNCTIONS_H_\",\
+            \"#define ENDIAN_REFLECTIONS_FUNCTIONS_H_\",\
+            \"\",\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"PREPROC\",\
+              \"format\": [\
+                \"%t\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
+            \"#include \\\"../src/function.h\\\"\",\
+            \"\"\
+          ]\
+        },\
+\
+\
+        {\
+          \"prefix\": [\
+            \"#endif\"\
+          ]\
+        }\
+      ]\
+    },\
+\
+\
+\
+\
+\
+    {\
+      \"name\": \"functions.c\",\
+      \"groups\": [\
+        {\
+          \"prefix\": [\
+            \"#include \\\"functions.h\\\"\",\
+            \"\"\
+          ]\
+        },\
+\
+\
+        {\
+          \"prefix\": [\
+            \"void\",\
+            \"function_call_init() {\"\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"function_init\",\
+              \"format\": [\
+                \"{%t}\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
+            \"}\",\
+            \"\"\
+          ]\
+        },\
+\
+\
+        {\
+          \"prefix\": [\
+            \"void\",\
+            \"function_call_load() {\"\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"function_load\",\
+              \"format\": [\
+                \"{%t}\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
+            \"}\",\
+            \"\"\
+          ]\
+        },\
+\
+\
+        {\
+          \"prefix\": [\
+            \"void\",\
+            \"function_call_save() {\"\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"function_save\",\
+              \"format\": [\
+                \"{%t}\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
+            \"}\",\
+            \"\"\
+          ]\
+        },\
+\
+\
+        {\
+          \"prefix\": [\
+            \"void\",\
+            \"function_call_cleanup() {\"\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"function_cleanup\",\
+              \"format\": [\
+                \"{%t}\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
+            \"}\"\
+          ]\
+        }\
+      ]\
+    }\
+  ]\
+}"
+
 #define ENDIAN_CORE_MIRRORS_COMMANDS "{\
   \"id\": \"commands\",\
   \"files\": [\
