@@ -11,6 +11,16 @@
             \"#ifndef ENDIAN_REFLECTIONS_COMMANDS_H_\",\
             \"#define ENDIAN_REFLECTIONS_COMMANDS_H_\",\
             \"\",\
+          ],\
+          \"foreach\": [\
+            {\
+              \"tag\": \"PREPROC\",\
+              \"format\": [\
+                \"%t\"\
+              ]\
+            }\
+          ],\
+          \"postfix\": [\
             \"#include \\\"../src/command.h\\\"\",\
             \"\"\
           ]\
