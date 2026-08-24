@@ -10,6 +10,7 @@
 #include "mirror.h"
 #include "../src/fileio.h"
 #include "serial_file.h"
+#include "reflection.h"
 
 #define mod_dir_load(pre_path, path, func)                            \
   {                                                                   \
@@ -21,24 +22,42 @@
   }
 
 void
-mod_loader_mod_ns_data_dir_load(const char* file_path, const struct mirror* mir) {
-  struct serial_file sf = {};
-  serial_file_load(&sf, file_path);
-  serial_file_cleanup(&sf);
+mod_loader_mod_ns_data_dir_load(struct serial_files* files, const char* file_path, const char* file_name) {
+  files->len++;
+  files->arr = realloc(files->arr, files->len * sizeof(struct serial_file));
+  struct serial_file* sf = files->arr + files->len - 1;
+  serial_file_load(sf, file_path, file_name);
+
+  if (sf->tags.len == 0) {
+    serial_file_cleanup(sf);
+    files->len--;
+    files->arr = realloc(files->arr, files->len * sizeof(struct serial_file));
+  }
 }
 
 void
 mod_loader_mod_ns_data_load(const char* file_path, const char* file_name) {
   for (size_t i = 0; i < mirrors_global()->len; i++) {
-    if (strcmp(mirrors_global()->arr[i].id, file_name) == 0) {
-      mod_dir_load(file_path, "", mod_stack_global()->file = file_name; mod_loader_mod_ns_data_dir_load(file_path, &mirrors_global()->arr[i]));
+    const struct mirror* mir = mirrors_global()->arr + i;
+
+    if (strcmp(mir->id, file_name) == 0) {
+      struct serial_files files = {};
+
+      mod_dir_load(file_path, "", mod_stack_global()->file = file_name; mod_loader_mod_ns_data_dir_load(&files, file_path, file_name));
+
+      struct reflection ref;
+      reflection_init(&ref, mir);
+      reflection_gen(&ref, &files);
+      reflection_cleanup(&ref);
+
+      serial_files_cleanup(&files);
     }
   }
 }
 
 void
 mod_loader_mod_ns_load(const char* file_path) {
-  mod_dir_load(file_path, "", mod_loader_mod_ns_data_load(file_path, file_name));
+  mod_dir_load(file_path, "", mod_stack_global()->ns = file_name; mod_loader_mod_ns_data_load(file_path, file_name));
 }
 
 void

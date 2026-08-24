@@ -50,7 +50,9 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
   while (jsmn_iterator_next(&iter)) {
     END_JSON_CHECK_STRING(iter);
     char* line = jsmn_iterator_get_string_heap(json, iter.val);
-    const size_t linelen = strlen(line);
+    const size_t linelen = strlen(line) + 1;
+    line = realloc(line, linelen + 1);
+    strcat(line, "\n");
 
     bool escape = false;
 
@@ -119,12 +121,18 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
       if (current_block->buf.arr == NULL || current_block->buf.len == 0) {
         current_block->buf.len = 1;
         current_block->buf.arr = malloc(sizeof(char*));
-        current_block->buf.arr[0] = malloc(linelen + 1);
-        current_block->buf.arr[0][0] = '\0';
+        current_block->buf.arr[0] = NULL;
+      }
+
+      char* bufstr = current_block->buf.arr[current_block->buf.len - 1];
+
+      if (bufstr == NULL) {
+        current_block->buf.arr[current_block->buf.len - 1] = malloc(linelen + 1);
+        current_block->buf.arr[current_block->buf.len - 1][0] = '\0';
+        bufstr = current_block->buf.arr[current_block->buf.len - 1];
       }
 
       char charstr[2] = {line[i], '\0'};
-      char* bufstr = current_block->buf.arr[current_block->buf.len - 1];
       strcat(bufstr, charstr);
     }
 

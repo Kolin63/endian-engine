@@ -109,15 +109,19 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
 void
 serial_file_cleanup(struct serial_file* x) {
   if (x == NULL) return;
+  if (x->name != NULL) free(x->name);
   serial_file_tags_cleanup(&x->tags);
 }
 
 void
-serial_file_load(struct serial_file* s, const char* file_path) {
-  if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
-
+serial_file_load(struct serial_file* s, const char* file_path, const char* file_name) {
+  s->name = NULL;
   s->tags.arr = NULL;
   s->tags.len = 0;
+
+  if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
+
+  s->name = strdup(file_name);
 
   FILE* file = fopen(file_path, "r");
 
