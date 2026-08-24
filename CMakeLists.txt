@@ -29,7 +29,7 @@ set_target_properties(reflector PROPERTIES
 
 project(server C)
 
-file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c")
+file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c" "ref/*.c")
 
 add_executable(server ${SERVER_SRC})
 add_compile_definitions(ENDIAN_ENGINE)
