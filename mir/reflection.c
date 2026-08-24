@@ -49,8 +49,17 @@ reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf)
       const struct serial_file_tag* sftag = sf->tags.arr + j;
       if (strcmp(sftag->id, tag) != 0) continue;
 
-      char* sftag_data_caps = malloc(strlen(sftag->data) + 1);
-      strcaps(sftag_data_caps, sftag->data);
+      const char* sftag_data;
+      char* sftag_data_caps;
+
+      if (sftag->data == NULL) {
+        sftag_data = "";
+        sftag_data_caps = "";
+      } else {
+        sftag_data = sftag->data;
+        sftag_data_caps = malloc(strlen(sftag_data) + 1);
+        strcaps(sftag_data_caps, sftag->data);
+      }
 
       for (size_t k = 0; k < format->len; k++) {
         const struct mirror_format_block* block = format->arr + k;
@@ -80,8 +89,8 @@ reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf)
         case MFBT_DATA:
           buf->len++;
           buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(sftag->data) + 1);
-          strcpy(buf->arr[buf->len - 1], sftag->data);
+          buf->arr[buf->len - 1] = malloc(strlen(sftag_data) + 1);
+          strcpy(buf->arr[buf->len - 1], sftag_data);
           break;
         case MFBT_DATA_CAPS:
           buf->len++;
@@ -109,7 +118,7 @@ reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf)
           break;
         }
       }
-      free(sftag_data_caps);
+      if (sftag->data != NULL) free(sftag_data_caps);
     }
   }
 

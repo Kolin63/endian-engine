@@ -90,8 +90,6 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
       }
     }
 
-    if (data == NULL) data = "";
-
     tags->len++;
     tags->arr = realloc(tags->arr, tags->len * sizeof(struct serial_file_tag));
 
