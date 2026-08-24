@@ -119,7 +119,15 @@ reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf)
 }
 
 int
-reflection_group_write(const struct reflection_group* ref) {}
+reflection_group_write(FILE* file, const struct reflection_group* ref) {
+  int error = 0;
+
+  error += mirror_strings_write(file, &ref->mir->prefix);
+  error += mirror_strings_write(file, &ref->foreach_buf);
+  error += mirror_strings_write(file, &ref->mir->postfix);
+
+  return error;
+}
 
 void
 reflection_groups_cleanup(struct reflection_groups* ref) {
@@ -131,7 +139,14 @@ reflection_groups_cleanup(struct reflection_groups* ref) {
 }
 
 int
-reflection_groups_write(const struct reflection_groups* ref) {
+reflection_groups_write(FILE* file, const struct reflection_groups* ref) {
+  int error = 0;
+
+  for (size_t i = 0; i < ref->len; i++) {
+    error += reflection_group_write(file, ref->arr + i);
+  }
+
+  return error;
 }
 
 int
@@ -177,6 +192,10 @@ reflection_file_write(const struct reflection_file* ref) {
     error++;
     return error;
   }
+
+  error += reflection_groups_write(file, &ref->groups);
+
+  fclose(file);
 
   return error;
 }

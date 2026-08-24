@@ -173,7 +173,14 @@ mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const 
       f->tag = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "format") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      error += mirror_format_blocks_from_json(&f->format, iter.val, json);
+      int this_error = mirror_format_blocks_from_json(&f->format, iter.val, json);
+      if (this_error != 0) {
+        error += this_error;
+      } else {
+        for (size_t i = 0; i < f->format.len; i++) {
+          mirror_strings_remove_backslashes(&f->format.arr[i].buf);
+        }
+      }
     } else {
       error++;
       log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);
@@ -240,13 +247,25 @@ mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "prefix") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      error += mirror_strings_from_json(&g->prefix, iter.val, json);
+      int this_error = mirror_strings_from_json(&g->prefix, iter.val, json);
+      if (this_error != 0) {
+        error += this_error;
+      } else {
+        mirror_strings_remove_backslashes(&g->prefix);
+        mirror_strings_append_newline_to_all(&g->prefix);
+      }
     } else if (strcmp(iter.key, "foreach") == 0) {
       END_JSON_CHECK_ARRAY(iter);
       error += mirror_foreach_arr_from_json(&g->foreach, iter.val, json);
     } else if (strcmp(iter.key, "postfix") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      error += mirror_strings_from_json(&g->postfix, iter.val, json);
+      int this_error = mirror_strings_from_json(&g->postfix, iter.val, json);
+      if (this_error != 0) {
+        error += this_error;
+      } else {
+        mirror_strings_remove_backslashes(&g->postfix);
+        mirror_strings_append_newline_to_all(&g->postfix);
+      }
     } else {
       error++;
       log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);

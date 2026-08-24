@@ -34,11 +34,11 @@ struct reflection {
 
 void reflection_group_cleanup(struct reflection_group* ref);
 int reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf);
-int reflection_group_write(const struct reflection_group* ref);
+int reflection_group_write(FILE* file, const struct reflection_group* ref);
 
 void reflection_groups_cleanup(struct reflection_groups* ref);
 int reflection_groups_gen(struct reflection_groups* ref, const struct serial_file* sf);
-int reflection_groups_write(const struct reflection_groups* ref);
+int reflection_groups_write(FILE* file, const struct reflection_groups* ref);
 
 void reflection_file_cleanup(struct reflection_file* ref);
 int reflection_file_gen(struct reflection_file* ref, const struct serial_file* sf);
