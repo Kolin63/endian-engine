@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.4.2)
 
 find_package(CURL REQUIRED)
 
@@ -14,6 +14,7 @@ project(reflector C)
 file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/fileio.c")
 
 add_executable(reflector ${REFLECTOR_SRC})
+add_compile_definitions(END_REF_INSTANCE="${END_INSTANCE}" END_REF_SRC_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(reflector PRIVATE concord CURL::libcurl)
 

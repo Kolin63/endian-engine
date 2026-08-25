@@ -11,7 +11,7 @@
 #include "../src/fileio.h"
 #include "serial_file.h"
 #include "reflection.h"
-#include "write_instance_dir.h"
+#include "instance_dir.h"
 
 #define mod_dir_load(pre_path, path, func)                            \
   {                                                                   \
@@ -73,12 +73,25 @@ mod_loader_mod_load(const char* mod_path) {
   mod_stack_global()->file = "";
 
   mod_dir_load(mod_path, "data", mod_stack_global()->ns = file_name; mod_loader_mod_ns_load(file_path));
+
+  mirrors_cleanup(mirrors_global());
 }
 
 void
-mod_loader_load_mods(const char* instance_dir) {
+mod_loader_load_mods() {
+#ifndef END_REF_INSTANCE
+  static_assert(false, "you must do: cmake . -DEND_INSTANCE=foo");
+#endif
+#ifndef END_REF_SRC_DIR
+  static_assert(false, "src dir is not defined!!! it's cmake's fault, not yours");
+#endif
+
   log_info("Loading mods!");
 
-  write_instance_dir(instance_dir);
+  char* instance_dir = instance_dir_expand();
+
+  instance_dir_write(instance_dir);
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(file_path));
+
+  free(instance_dir);
 }

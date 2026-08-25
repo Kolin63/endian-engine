@@ -188,8 +188,8 @@ int
 reflection_file_write(const struct reflection_file* ref) {
   int error = 0;
 
-  char* path = malloc(4 + strlen(ref->name) + 1);
-  strcpy(path, "ref/");
+  char* path = malloc(strlen(END_REF_SRC_DIR "/ref/") + strlen(ref->name) + 1);
+  strcpy(path, END_REF_SRC_DIR "/ref/");
   strcat(path, ref->name);
 
   FILE* file = fopen(path, "w");
@@ -240,12 +240,12 @@ int
 reflection_files_write(const struct reflection_files* ref) {
   int error = 0;
 
-  FILE* dir = fopen("ref", "r");
+  FILE* dir = fopen(END_REF_SRC_DIR "/ref", "r");
   if (dir == NULL) {
     mkdir("ref", 0b111111111);
-    dir = fopen("ref", "r");
+    dir = fopen(END_REF_SRC_DIR "/ref", "r");
     if (dir == NULL) {
-      log_error("Could not create ref/ directory");
+      log_error("Could not create ref/ directory (" END_REF_SRC_DIR "/ref)");
       error++;
       return error;
     } else {
