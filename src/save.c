@@ -9,7 +9,7 @@
 #include "bot.h"
 #include "fileio.h"
 #include "log.h"
-#include "../ref/instance_dir.h"
+#include "endapi/ref/instance_dir.h"
 
 int
 save_write(const char* ns, const char* dir, const char* file,
@@ -19,23 +19,16 @@ save_write(const char* ns, const char* dir, const char* file,
   strcat(path, INSTANCE_DIR "/saves/");
   strcat(path, ns);
 
-  // check that the namespace directory exists
-  FILE* dir_check = fopen(path, "r");
-  if (dir_check == NULL) {
-    mkdir(path, 0b111111111);
-  } else {
-    fclose(dir_check);
+  if (fileio_ensure_dir_exists(path) != 0) {
+    log_error("Could not write save file as a result of failure to make dir %s", path);
   }
 
   strcat(path, "/");
   strcat(path, dir);
 
   // check that the namespace/dir directory exists
-  dir_check = fopen(path, "r");
-  if (dir_check == NULL) {
-    mkdir(path, 0b111111111);
-  } else {
-    fclose(dir_check);
+  if (fileio_ensure_dir_exists(path) != 0) {
+    log_error("Could not write save file as a result of failure to make dir %s", path);
   }
 
   strcat(path, "/");

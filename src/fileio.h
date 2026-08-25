@@ -11,6 +11,9 @@ char* fileio_read_all(FILE* file);
 
 jsmntok_t* fileio_read_json(const char* json);
 
+// returns 0 if ok
+int fileio_ensure_dir_exists(const char* path);
+
 #define dir_load(directory_arg, function_arg)                                  \
   /*                                                                           \
     calls 'function_arg' for every top level file or directory in              \

@@ -10,6 +10,7 @@
 #include "serial_file.h"
 #include "strings.h"
 #include "mod_stack.h"
+#include "../src/fileio.h"
 
 void
 reflection_group_cleanup(struct reflection_group* ref) {
@@ -240,19 +241,10 @@ int
 reflection_files_write(const struct reflection_files* ref) {
   int error = 0;
 
-  FILE* dir = fopen(END_REF_SRC_DIR "/ref", "r");
-  if (dir == NULL) {
-    mkdir(END_REF_SRC_DIR "/ref", 0b111111111);
-    dir = fopen(END_REF_SRC_DIR "/ref", "r");
-    if (dir == NULL) {
-      log_error("Could not create ref/ directory (" END_REF_SRC_DIR "/ref)");
-      error++;
-      return error;
-    } else {
-      fclose(dir);
-    }
-  } else {
-    fclose(dir);
+  if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") != 0) {
+    log_error("Could not create ref/ directory (" END_REF_SRC_DIR "/ref)");
+    error++;
+    return error;
   }
 
   for (size_t i = 0; i < ref->len; i++) {

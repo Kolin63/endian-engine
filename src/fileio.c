@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <stdio.h>
 
 #define JSMN_HEADER
 #include <concord/jsmn.h>
@@ -52,4 +54,22 @@ fileio_read_json(const char* json) {
       return NULL;
     }
   }
+}
+
+int
+fileio_ensure_dir_exists(const char* path) {
+  FILE* dir = fopen(path, "r");
+  if (dir == NULL) {
+    mkdir(path, 0b111111111);
+    dir = fopen(path, "r");
+    if (dir == NULL) {
+      log_error("Could not create directory %s", path);
+      return 1;
+    } else {
+      fclose(dir);
+    }
+  } else {
+    fclose(dir);
+  }
+  return 0;
 }
