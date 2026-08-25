@@ -242,7 +242,7 @@ reflection_files_write(const struct reflection_files* ref) {
 
   FILE* dir = fopen(END_REF_SRC_DIR "/ref", "r");
   if (dir == NULL) {
-    mkdir("ref", 0b111111111);
+    mkdir(END_REF_SRC_DIR "/ref", 0b111111111);
     dir = fopen(END_REF_SRC_DIR "/ref", "r");
     if (dir == NULL) {
       log_error("Could not create ref/ directory (" END_REF_SRC_DIR "/ref)");
