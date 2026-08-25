@@ -39,6 +39,6 @@ void command_create(const struct command* cmd, const struct discord_ready* event
 void command_create_all(const struct discord_ready* event);
 enum command_id command_id_get(const char* str);
 
-#include "../ref/commands.h"
+#include "endapi/ref/commands.h"
 
 #endif

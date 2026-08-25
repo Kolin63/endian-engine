@@ -12,6 +12,7 @@
 #include "serial_file.h"
 #include "reflection.h"
 #include "instance_dir.h"
+#include "linker.h"
 
 #define mod_dir_load(pre_path, path, func)                            \
   {                                                                   \
@@ -74,6 +75,9 @@ mod_loader_mod_load(const char* mod_path) {
 
   mod_dir_load(mod_path, "data", mod_stack_global()->ns = file_name; mod_loader_mod_ns_load(file_path));
 
+  mod_stack_global()->ns = "";
+  mod_dir_load(mod_path, "src", linker_link(file_path, "ref/include", mod_stack_global()->mod, file_name));
+
   mirrors_cleanup(mirrors_global());
 }
 
@@ -86,12 +90,25 @@ mod_loader_load_mods() {
   static_assert(false, "src dir is not defined!!! it's cmake's fault, not yours");
 #endif
 
+  if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") +
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include") +
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi") +
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi/ref") != 0) {
+    log_error("Could not make hardlink directories");
+    return;
+  }
+
   log_info("Loading mods!");
 
   char* instance_dir = instance_dir_expand();
 
   instance_dir_write(instance_dir);
+
+  mod_dir_load(END_REF_SRC_DIR, "src", linker_link_headers_only(file_path, "ref/include", "endapi", file_name));
+
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(file_path));
+
+  mod_dir_load(END_REF_SRC_DIR, "ref", linker_link_headers_only(file_path, "ref/include/endapi", "ref", file_name));
 
   free(instance_dir);
 }

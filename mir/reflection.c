@@ -241,12 +241,6 @@ int
 reflection_files_write(const struct reflection_files* ref) {
   int error = 0;
 
-  if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") != 0) {
-    log_error("Could not create ref/ directory (" END_REF_SRC_DIR "/ref)");
-    error++;
-    return error;
-  }
-
   for (size_t i = 0; i < ref->len; i++) {
     error += reflection_file_write(ref->arr + i);
   }

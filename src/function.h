@@ -7,6 +7,6 @@ void function_call_load();
 void function_call_save();
 void function_call_cleanup();
 
-#include "../ref/functions.h"
+#include "endapi/ref/functions.h"
 
 #endif

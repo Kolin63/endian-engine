@@ -12,7 +12,7 @@
 #include "exit.h"
 #include "log.h"
 #include "function.h"
-#include "../ref/instance_dir.h"
+#include "endapi/ref/instance_dir.h"
 
 static struct bot* global_bot = NULL;
 
@@ -56,6 +56,8 @@ on_interaction(struct discord* client, const struct discord_interaction* event) 
   const char* cmd_name = event->data->name;
 
   enum command_id cmd_id = command_id_get(cmd_name);
+
+  cmd_id = COMMAND_PING;
 
   if (cmd_id == COMMAND_UNKNOWN_) {
     log_error("Could not find command %s", cmd_name);
