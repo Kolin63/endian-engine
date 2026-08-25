@@ -30,16 +30,24 @@ set_target_properties(reflector PROPERTIES
 
 project(server C)
 
-file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c" "ref/*.c")
+add_custom_target(
+  reflections ALL ${CMAKE_CURRENT_SOURCE_DIR}/reflector
+  DEPENDS reflector
+  USES_TERMINAL
+)
+
+file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c" "ref/*.c" "ref/include/*/*.c")
 
 add_executable(server ${SERVER_SRC})
+add_dependencies(server reflections)
 add_compile_definitions(ENDIAN_ENGINE)
 
 target_link_libraries(server PRIVATE concord CURL::libcurl)
 
 target_include_directories(server PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
-  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ref/include")
 
 set_target_properties(server PROPERTIES
   C_STANDARD 23
