@@ -40,6 +40,7 @@ on_ready(struct discord*, const struct discord_ready* event) {
     return;
   }
 
+  command_create_all(event);
   function_call_init();
   function_call_load();
   set_cleanup_ready();
