@@ -23,11 +23,15 @@ discord_application_command_options_cleanup(struct discord_application_command_o
 // converts endian command options to concord command options
 struct discord_application_command_options*
 command_options_end_to_conc(const struct command_options* end) {
-  if (end == NULL) return NULL;
-
   struct discord_application_command_options* conc = malloc(sizeof(struct discord_application_command_options));
+
   conc->size = end->size;
-  conc->array = malloc(sizeof(struct discord_application_command_option) * conc->size);
+  if (end->size > 0) {
+    conc->array = malloc(sizeof(struct discord_application_command_option) * conc->size);
+  } else {
+    conc->array = NULL;
+  }
+
   for (int i = 0; i < end->size; i++) {
     const struct command_option* eopt = &(end->options[i]);
     struct discord_application_command_option* copt = &(conc->array[i]);
