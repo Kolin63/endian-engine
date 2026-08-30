@@ -5,8 +5,8 @@
 #include <concord/discord_codecs.h>
 
 struct command_options {
-  const int size;
-  const struct command_option* options;
+  const struct command_option* arr;
+  const int len;
 };
 
 struct command_option {

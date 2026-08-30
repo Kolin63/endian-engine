@@ -25,15 +25,15 @@ struct discord_application_command_options*
 command_options_end_to_conc(const struct command_options* end) {
   struct discord_application_command_options* conc = malloc(sizeof(struct discord_application_command_options));
 
-  conc->size = end->size;
-  if (end->size > 0) {
+  conc->size = end->len;
+  if (end->len > 0) {
     conc->array = malloc(sizeof(struct discord_application_command_option) * conc->size);
   } else {
     conc->array = NULL;
   }
 
-  for (int i = 0; i < end->size; i++) {
-    const struct command_option* eopt = &(end->options[i]);
+  for (int i = 0; i < end->len; i++) {
+    const struct command_option* eopt = &(end->arr[i]);
     struct discord_application_command_option* copt = &(conc->array[i]);
     copt->required = eopt->required;
     copt->autocomplete = eopt->autocomplete;
