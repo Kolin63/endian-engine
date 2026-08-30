@@ -7,6 +7,7 @@
 #include <concord/jsmn.h>
 
 #include "mirror_strings.h"
+#include "../src/endvec.h"
 
 enum mirror_format_block_type {
   MFBT_NULL,
@@ -24,20 +25,14 @@ struct mirror_format_block {
   struct mirror_strings buf;
 };
 
-struct mirror_format_blocks {
-  struct mirror_format_block* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(mirror_format_blocks, struct mirror_format_block);
 
 struct mirror_foreach {
   char* tag;
   struct mirror_format_blocks format;
 };
 
-struct mirror_foreach_arr {
-  struct mirror_foreach* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(mirror_foreach_arr, struct mirror_foreach);
 
 struct mirror_group {
   struct mirror_strings prefix;
@@ -45,30 +40,21 @@ struct mirror_group {
   struct mirror_strings postfix;
 };
 
-struct mirror_groups {
-  struct mirror_group* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(mirror_groups, struct mirror_group);
 
 struct mirror_file {
   char* name;
   struct mirror_groups groups;
 };
 
-struct mirror_files {
-  struct mirror_file* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(mirror_files, struct mirror_file);
 
 struct mirror {
   char* id;
   struct mirror_files files;
 };
 
-struct mirrors {
-  struct mirror* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(mirrors, struct mirror);
 
 void mirror_format_block_cleanup(struct mirror_format_block* f);
 

@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #include "mirror_strings.h"
+#include "../src/endvec.h"
 
 struct serial_file_tag {
   char* id;
@@ -12,20 +13,14 @@ struct serial_file_tag {
   char* buf;
 };
 
-struct serial_file_tags {
-  struct serial_file_tag* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(serial_file_tags, struct serial_file_tag);
 
 struct serial_file {
   char* name;
   struct serial_file_tags tags;
 };
 
-struct serial_files {
-  struct serial_file* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(serial_files, struct serial_file);
 
 void serial_file_tag_cleanup(struct serial_file_tag* x);
 

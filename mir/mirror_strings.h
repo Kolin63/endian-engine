@@ -6,10 +6,9 @@
 #define JSMN_HEADER
 #include <concord/jsmn.h>
 
-struct mirror_strings {
-  char** arr;
-  size_t len;
-};
+#include "../src/endvec.h"
+
+ENDVEC_DECLARE(mirror_strings, char*);
 
 void mirror_strings_append_newline_to_all(struct mirror_strings* arr);
 void mirror_strings_cleanup(struct mirror_strings* arr);

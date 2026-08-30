@@ -16,19 +16,16 @@
 
 static struct mirrors global = {};
 
+ENDVEC_DEFINE(mirror_format_blocks, struct mirror_format_block, mirror_format_block_cleanup(arr->arr + i));
+ENDVEC_DEFINE(mirror_foreach_arr, struct mirror_foreach, mirror_foreach_cleanup(arr->arr + i));
+ENDVEC_DEFINE(mirror_groups, struct mirror_group, mirror_group_cleanup(arr->arr + i));
+ENDVEC_DEFINE(mirror_files, struct mirror_file, mirror_file_cleanup(arr->arr + i));
+ENDVEC_DEFINE(mirrors, struct mirror, mirror_cleanup(arr->arr + i));
+
 void
 mirror_format_block_cleanup(struct mirror_format_block* f) {
   if (f == NULL) return;
   mirror_strings_cleanup(&f->buf);
-}
-
-void
-mirror_format_blocks_cleanup(struct mirror_format_blocks* f) {
-  if (f == NULL || f->arr == NULL || f->len == 0) return;
-  for (size_t i = 0; i < f->len; i++) {
-    mirror_format_block_cleanup(&f->arr[i]);
-  }
-  free(f->arr);
 }
 
 int
@@ -94,8 +91,7 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
           continue;
         }
         if (current_block->type != MFBT_NULL) {
-          f->len++;
-          f->arr = realloc(f->arr, f->len * sizeof(struct mirror_format_block));
+          mirror_format_blocks_append(f, (struct mirror_format_block){});
           current_block = &f->arr[f->len - 1];
         }
         current_block->type = type;
@@ -109,8 +105,7 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
 
       if (current_block->type != MFBT_CONST) {
         if (current_block->type != MFBT_NULL) {
-          f->len++;
-          f->arr = realloc(f->arr, f->len * sizeof(struct mirror_format_block));
+          mirror_format_blocks_append(f, (struct mirror_format_block){});
           current_block = &f->arr[f->len - 1];
         }
         current_block->type = MFBT_CONST;
@@ -119,9 +114,7 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
       }
 
       if (current_block->buf.arr == NULL || current_block->buf.len == 0) {
-        current_block->buf.len = 1;
-        current_block->buf.arr = malloc(sizeof(char*));
-        current_block->buf.arr[0] = NULL;
+        mirror_strings_append(&current_block->buf, NULL);
       }
 
       char* bufstr = current_block->buf.arr[current_block->buf.len - 1];
@@ -139,9 +132,7 @@ mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* 
     free(line);
 
     if (current_block->type == MFBT_CONST) {
-      current_block->buf.len++;
-      current_block->buf.arr = realloc(current_block->buf.arr, current_block->buf.len * sizeof(char*));
-      current_block->buf.arr[current_block->buf.len - 1] = NULL;
+      mirror_strings_append(&current_block->buf, NULL);
     }
   }
 
@@ -190,15 +181,6 @@ mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const 
   return error;
 }
 
-void
-mirror_foreach_arr_cleanup(struct mirror_foreach_arr* arr) {
-  if (arr->len == 0 || arr == NULL) return;
-  for (size_t i = 0; i < arr->len; i++) mirror_foreach_cleanup(&arr->arr[i]);
-  free(arr->arr);
-  arr->arr = NULL;
-  arr->len = 0;
-}
-
 int
 mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
@@ -212,8 +194,7 @@ mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* js
   END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
-    arr->len++;
-    arr->arr = realloc(arr->arr, sizeof(struct mirror_foreach) * arr->len);
+    mirror_foreach_arr_append(arr, (struct mirror_foreach){});
     error += mirror_foreach_from_json(&arr->arr[arr->len - 1], iter.val, json);
   }
 
@@ -275,15 +256,6 @@ mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char
   return error;
 }
 
-void
-mirror_groups_cleanup(struct mirror_groups* arr) {
-  if (arr->len == 0 || arr == NULL) return;
-  for (size_t i = 0; i < arr->len; i++) mirror_group_cleanup(&arr->arr[i]);
-  free(arr->arr);
-  arr->arr = NULL;
-  arr->len = 0;
-}
-
 int
 mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
@@ -297,8 +269,7 @@ mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const 
   END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
-    arr->len++;
-    arr->arr = realloc(arr->arr, sizeof(struct mirror_group) * arr->len);
+    mirror_groups_append(arr, (struct mirror_group){});
     error += mirror_group_from_json(&arr->arr[arr->len - 1], iter.val, json);
   }
 
@@ -341,15 +312,6 @@ mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* 
   return error;
 }
 
-void
-mirror_files_cleanup(struct mirror_files* arr) {
-  if (arr->len == 0 || arr == NULL) return;
-  for (size_t i = 0; i < arr->len; i++) mirror_file_cleanup(&arr->arr[i]);
-  free(arr->arr);
-  arr->arr = NULL;
-  arr->len = 0;
-}
-
 int
 mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
@@ -363,8 +325,7 @@ mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const ch
   END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
 
   while (jsmn_iterator_next(&iter)) {
-    arr->len++;
-    arr->arr = realloc(arr->arr, sizeof(struct mirror_file) * arr->len);
+    mirror_files_append(arr, (struct mirror_file){});
     error += mirror_file_from_json(&arr->arr[arr->len - 1], iter.val, json);
   }
 
@@ -437,20 +398,9 @@ mirror_load_from_str(const char* str) {
 
   free(jsmn);
 
-  global.len++;
-  global.arr = realloc(global.arr, global.len * sizeof(struct mirror));
-  global.arr[global.len - 1] = m;
+  mirrors_append(&global, m);
 
   log_info("Loading mirror %s", m.id);
-}
-
-void
-mirrors_cleanup(struct mirrors* arr) {
-  if (arr->len == 0 || arr == NULL) return;
-  for (size_t i = 0; i < arr->len; i++) mirror_cleanup(&arr->arr[i]);
-  free(arr->arr);
-  arr->arr = NULL;
-  arr->len = 0;
 }
 
 struct mirrors*

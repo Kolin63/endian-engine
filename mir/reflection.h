@@ -7,26 +7,21 @@
 #include "mirror.h"
 #include "mirror_strings.h"
 #include "serial_file.h"
+#include "../src/endvec.h"
 
 struct reflection_group {
   const struct mirror_group* mir;
   struct mirror_strings foreach_buf;
 };
 
-struct reflection_groups {
-  struct reflection_group* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(reflection_groups, struct reflection_group);
 
 struct reflection_file {
   const char* name;
   struct reflection_groups groups;
 };
 
-struct reflection_files {
-  struct reflection_file* arr;
-  size_t len;
-};
+ENDVEC_DECLARE(reflection_files, struct reflection_file);
 
 struct reflection {
   struct reflection_files files;

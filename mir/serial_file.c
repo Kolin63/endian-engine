@@ -10,6 +10,9 @@
 
 #define LINE_BUF_SIZE 65536
 
+ENDVEC_DEFINE(serial_file_tags, struct serial_file_tag, serial_file_tag_cleanup(arr->arr + i));
+ENDVEC_DEFINE(serial_files, struct serial_file, serial_file_cleanup(arr->arr + i));
+
 void
 serial_file_tag_cleanup(struct serial_file_tag* x) {
   if (x == NULL) return;
@@ -31,15 +34,6 @@ serial_file_tag_get_param(char* line) {
     }
   }
   return start;
-}
-
-void
-serial_file_tags_cleanup(struct serial_file_tags* x) {
-  if (x == NULL || x->len == 0) return;
-  for (size_t i = 0; i < x->len; i++) {
-    serial_file_tag_cleanup(&x->arr[i]);
-  }
-  free(x->arr);
 }
 
 int
@@ -136,13 +130,4 @@ serial_file_load(struct serial_file* s, const char* file_path, const char* file_
   fclose(file);
 
   log_info("Serializing file %s", mod_stack_global()->file);
-}
-
-void
-serial_files_cleanup(struct serial_files* x) {
-  if (x == NULL || x->len == 0) return;
-  for (size_t i = 0; i < x->len; i++) {
-    serial_file_cleanup(&x->arr[i]);
-  }
-  free(x->arr);
 }

@@ -12,6 +12,9 @@
 #include "mod_stack.h"
 #include "../src/fileio.h"
 
+ENDVEC_DEFINE(reflection_groups, struct reflection_group, reflection_group_cleanup(arr->arr + i));
+ENDVEC_DEFINE(reflection_files, struct reflection_file, reflection_file_cleanup(arr->arr + i));
+
 void
 reflection_group_cleanup(struct reflection_group* ref) {
   if (ref == NULL) return;
@@ -82,40 +85,22 @@ reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf)
           }
           break;
         case MFBT_TAG_CONTENT:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(sftag->buf) + 1);
-          strcpy(buf->arr[buf->len - 1], sftag->buf);
+          mirror_strings_append(buf, strdup(sftag->buf));
           break;
         case MFBT_DATA:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(sftag_data) + 1);
-          strcpy(buf->arr[buf->len - 1], sftag_data);
+          mirror_strings_append(buf, strdup(sftag_data));
           break;
         case MFBT_DATA_CAPS:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(sftag_data_caps) + 1);
-          strcpy(buf->arr[buf->len - 1], sftag_data_caps);
+          mirror_strings_append(buf, strdup(sftag_data_caps));
           break;
         case MFBT_NS:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(ns) + 1);
-          strcpy(buf->arr[buf->len - 1], ns);
+          mirror_strings_append(buf, strdup(ns));
           break;
         case MFBT_NS_CAPS:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen(ns_caps) + 1);
-          strcpy(buf->arr[buf->len - 1], ns_caps);
+          mirror_strings_append(buf, strdup(ns_caps));
           break;
         case MFBT_ALPHA_SWITCH:
-          buf->len++;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          buf->arr[buf->len - 1] = malloc(strlen("// TODO") + 1);
-          strcpy(buf->arr[buf->len - 1], "// TODO");
+          mirror_strings_append(buf, strdup("// TODO"));
           break;
         }
       }
@@ -137,15 +122,6 @@ reflection_group_write(FILE* file, const struct reflection_group* ref) {
   error += mirror_strings_write(file, &ref->mir->postfix);
 
   return error;
-}
-
-void
-reflection_groups_cleanup(struct reflection_groups* ref) {
-  if (ref == NULL || ref->len == 0 || ref->arr == NULL) return;
-  for (size_t i = 0; i < ref->len; i++) {
-    reflection_group_cleanup(ref->arr + i);
-  }
-  free(ref->arr);
 }
 
 int
@@ -210,15 +186,6 @@ reflection_file_write(const struct reflection_file* ref) {
   log_info("Generating file %s", ref->name);
 
   return error;
-}
-
-void
-reflection_files_cleanup(struct reflection_files* ref) {
-  if (ref == NULL || ref->len == 0 || ref->arr == NULL) return;
-  for (size_t i = 0; i < ref->len; i++) {
-    reflection_file_cleanup(ref->arr + i);
-  }
-  free(ref->arr);
 }
 
 int
