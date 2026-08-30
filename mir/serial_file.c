@@ -84,8 +84,7 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
       }
     }
 
-    tags->len++;
-    tags->arr = realloc(tags->arr, tags->len * sizeof(struct serial_file_tag));
+    serial_file_tags_append(tags, (struct serial_file_tag){});
 
     struct serial_file_tag* tag = &tags->arr[tags->len - 1];
 

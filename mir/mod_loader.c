@@ -25,8 +25,7 @@
 
 void
 mod_loader_mod_ns_data_dir_load(struct serial_files* files, const char* file_path, const char* file_name) {
-  files->len++;
-  files->arr = realloc(files->arr, files->len * sizeof(struct serial_file));
+  serial_files_append(files, (struct serial_file){});
   struct serial_file* sf = files->arr + files->len - 1;
   serial_file_load(sf, file_path, file_name);
 
