@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "core_mirrors.h"
 #include "log.h"
 #include "mod_stack.h"
 #include "mirror.h"
@@ -65,10 +64,6 @@ void
 mod_loader_mod_load(const char* mod_path) {
   log_info("Loading mod %s", mod_stack_global()->mod);
 
-  mod_stack_global()->file = "core_mirrors.h";
-  mirror_load_from_str(ENDIAN_CORE_MIRRORS_FUNCTIONS);
-  mirror_load_from_str(ENDIAN_CORE_MIRRORS_COMMANDS);
-
   mod_dir_load(mod_path, "mirrors", mod_stack_global()->file = file_name; mirror_load(file_path));
   mod_stack_global()->file = "";
 
@@ -104,6 +99,12 @@ mod_loader_load_mods() {
   instance_dir_write(instance_dir);
 
   mod_dir_load(END_REF_SRC_DIR, "src", linker_link_headers_only(file_path, "ref/include", "endapi", file_name));
+
+  mod_stack_global()->mod = "engine";
+  mod_stack_global()->file = END_REF_SRC_DIR "/mir/mirrors/functions.json";
+  mirror_load(END_REF_SRC_DIR "/mir/mirrors/functions.json");
+  mod_stack_global()->file = END_REF_SRC_DIR "/mir/mirrors/commands.json";
+  mirror_load(END_REF_SRC_DIR "/mir/mirrors/commands.json");
 
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(file_path));
 
