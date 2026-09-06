@@ -68,12 +68,10 @@
         {
           "tag": "command",
           "format": [
-            "%A",
-            "%d",
-            "%A",
-            "return COMMAND_%D",
-            "%A",
-            "return COMMAND_UNKNOWN_;",
+            "%Astr",
+            "%A%d",
+            "%Areturn COMMAND_%D;",
+            "%Areturn COMMAND_UNKNOWN_;",
             "%A"
           ]
         },

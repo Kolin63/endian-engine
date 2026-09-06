@@ -58,8 +58,6 @@ on_interaction(struct discord* client, const struct discord_interaction* event) 
 
   enum command_id cmd_id = command_id_get(cmd_name);
 
-  cmd_id = COMMAND_PING;
-
   if (cmd_id == COMMAND_UNKNOWN_) {
     log_error("Could not find command %s", cmd_name);
     // TODO: send error message to user via discord
