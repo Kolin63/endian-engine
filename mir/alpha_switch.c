@@ -15,6 +15,7 @@ alpha_switch_case_cleanup(struct alpha_switch_case* alpha) {
   if (alpha == NULL) return;
   if (alpha->val != NULL) free(alpha->val);
   mirror_strings_cleanup(&alpha->buf);
+  alpha->val = NULL;
 }
 
 void
@@ -23,6 +24,9 @@ alpha_switch_cleanup(struct alpha_switch* alpha) {
   if (alpha->switch_on != NULL) free(alpha->switch_on);
   alpha_switch_cases_cleanup(&alpha->cases);
   mirror_strings_cleanup(&alpha->def);
+  alpha->escapes_encountered = 0;
+  alpha->switch_on = NULL;
+  alpha->buf = NULL;
 }
 
 void

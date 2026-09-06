@@ -185,13 +185,6 @@ reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
     case MIR_FOREACH_BEGIN:
       in_foreach = true;
       foreach_block.arr = (struct mirror_format_token*)(token + 1);
-      ref->alpha.escapes_encountered = 0;
-      ref->alpha.switch_on = NULL;
-      ref->alpha.cases.arr = NULL;
-      ref->alpha.cases.len = 0;
-      ref->alpha.def.arr = NULL;
-      ref->alpha.def.len = 0;
-      ref->alpha.buf = NULL;
       break;
     }
   }
@@ -272,8 +265,7 @@ reflection_init(struct reflection* ref, const struct mirror* mir) {
   ref->files.arr = malloc(ref->files.cap * sizeof(struct reflection_out));
   for (size_t i = 0; i < ref->files.len; i++) {
     ref->files.arr[i].mir_file = mir->files.arr + i;
-    ref->files.arr[i].buf.arr = NULL;
-    ref->files.arr[i].buf.len = 0;
-    ref->files.arr[i].buf.cap = 0;
+    ref->files.arr[i].buf = (struct mirror_strings){};
+    ref->files.arr[i].alpha = (struct alpha_switch){};
   }
 }
