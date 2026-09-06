@@ -57,6 +57,7 @@ mirror_strings_from_json(struct mirror_strings* arr, const jsmntok_t* jsmn, cons
 
   arr->arr = NULL;
   arr->len = 0;
+  arr->cap = 0;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);

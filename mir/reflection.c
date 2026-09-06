@@ -12,18 +12,12 @@
 #include "mod_stack.h"
 #include "../src/fileio.h"
 
-ENDVEC_DEFINE(reflection_groups, struct reflection_group, reflection_group_cleanup(arr->arr + i));
-ENDVEC_DEFINE(reflection_files, struct reflection_file, reflection_file_cleanup(arr->arr + i));
+ENDVEC_DEFINE(reflection_outs, struct reflection_out, reflection_out_cleanup(arr->arr + i));
 
-void
-reflection_group_cleanup(struct reflection_group* ref) {
-  if (ref == NULL) return;
-  mirror_strings_cleanup(&ref->foreach_buf);
-}
-
-void
-strcaps(char* buf, const char* in) {
+char*
+strcaps(const char* in) {
   size_t len = strlen(in);
+  char* buf = malloc(len + 1);
   for (size_t i = 0; i < len; i++) {
     char c = in[i];
     if (c >= 'a' && c <= 'z') {
@@ -33,141 +27,161 @@ strcaps(char* buf, const char* in) {
     }
   }
   buf[len] = '\0';
-}
-
-int
-reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf) {
-  int error = 0;
-
-  const char* ns = mod_stack_global()->ns;
-  char* ns_caps = malloc(strlen(ns) + 1);
-  strcaps(ns_caps, ns);
-
-  struct mirror_strings* buf = &ref->foreach_buf;
-
-  for (size_t i = 0; i < ref->mir->foreach.len; i++) {
-    const char* tag = ref->mir->foreach.arr[i].tag;
-    const struct mirror_format_blocks* format = &ref->mir->foreach.arr[i].format;
-
-    for (size_t j = 0; j < sf->tags.len; j++) {
-      const struct serial_file_tag* sftag = sf->tags.arr + j;
-      if (strcmp(sftag->id, tag) != 0) continue;
-
-      const char* sftag_data;
-      char* sftag_data_caps;
-
-      if (sftag->data == NULL) {
-        sftag_data = "";
-        sftag_data_caps = "";
-      } else {
-        sftag_data = sftag->data;
-        sftag_data_caps = malloc(strlen(sftag_data) + 1);
-        strcaps(sftag_data_caps, sftag->data);
-      }
-
-      for (size_t k = 0; k < format->len; k++) {
-        const struct mirror_format_block* block = format->arr + k;
-
-        switch (block->type) {
-        case MFBT_NULL:
-          log_warn(MOD_STACK_FMT "Unexpected block type MFBT_NULL", MOD_STACK_ARG);
-          break;
-        case MFBT_CONST:
-          buf->len += block->buf.len;
-          buf->arr = realloc(buf->arr, buf->len * sizeof(char*));
-          for (size_t l = buf->len - block->buf.len; l < buf->len; l++) {
-            if (block->buf.arr[l + block->buf.len - buf->len] == NULL) {
-              buf->arr[l] = NULL;
-              continue;
-            }
-            buf->arr[l] = malloc(strlen(block->buf.arr[l + block->buf.len - buf->len]) + 1);
-            strcpy(buf->arr[l], block->buf.arr[l + block->buf.len - buf->len]);
-          }
-          break;
-        case MFBT_TAG_CONTENT:
-          mirror_strings_append(buf, strdup(sftag->buf));
-          break;
-        case MFBT_DATA:
-          mirror_strings_append(buf, strdup(sftag_data));
-          break;
-        case MFBT_DATA_CAPS:
-          mirror_strings_append(buf, strdup(sftag_data_caps));
-          break;
-        case MFBT_NS:
-          mirror_strings_append(buf, strdup(ns));
-          break;
-        case MFBT_NS_CAPS:
-          mirror_strings_append(buf, strdup(ns_caps));
-          break;
-        case MFBT_ALPHA_SWITCH:
-          mirror_strings_append(buf, strdup("// TODO"));
-          break;
-        }
-      }
-      if (sftag->data != NULL) free(sftag_data_caps);
-    }
-  }
-
-  free(ns_caps);
-
-  return error;
-}
-
-int
-reflection_group_write(FILE* file, const struct reflection_group* ref) {
-  int error = 0;
-
-  error += mirror_strings_write(file, &ref->mir->prefix);
-  error += mirror_strings_write(file, &ref->foreach_buf);
-  error += mirror_strings_write(file, &ref->mir->postfix);
-
-  return error;
-}
-
-int
-reflection_groups_write(FILE* file, const struct reflection_groups* ref) {
-  int error = 0;
-
-  for (size_t i = 0; i < ref->len; i++) {
-    error += reflection_group_write(file, ref->arr + i);
-  }
-
-  return error;
-}
-
-int
-reflection_groups_gen(struct reflection_groups* ref, const struct serial_file* sf) {
-  int error = 0;
-
-  for (size_t i = 0; i < ref->len; i++) {
-    error += reflection_group_gen(ref->arr + i, sf);
-  }
-
-  return error;
+  return buf;
 }
 
 void
-reflection_file_cleanup(struct reflection_file* ref) {
+reflection_out_cleanup(struct reflection_out* ref) {
   if (ref == NULL) return;
-  reflection_groups_cleanup(&ref->groups);
+  mirror_strings_cleanup(&ref->buf);
 }
 
 int
-reflection_file_gen(struct reflection_file* ref, const struct serial_file* sf) {
+reflection_foreach_perfile_gen(struct mirror_strings* buf, const char* tag, const struct serial_file* sf,
+                               const struct mirror_format_token* token) {
   int error = 0;
 
-  error += reflection_groups_gen(&ref->groups, sf);
+  struct serial_file_tag* sf_tag_block = NULL;
+  if (tag != NULL) {
+    for (size_t i = 0; i < sf->tags.len; i++) {
+      if (strcmp(tag, sf->tags.arr[i].id) == 0) {
+        sf_tag_block = sf->tags.arr + i;
+        break;
+      }
+    }
+    if (sf_tag_block == NULL) {
+      return error;
+    }
+  }
+
+  switch (token->type) {
+  case MIR_CONST:
+    mirror_strings_append(buf, strdup(token->buf));
+    break;
+
+  case MIR_FOREACH_BEGIN:
+    log_error(MOD_STACK_FMT "unexpected MIR_FOREACH_BEGIN in already begun foreach", MOD_STACK_ARG);
+    error++;
+    break;
+
+  case MIR_TAG_CONTENT:
+    if (sf_tag_block == NULL) {
+      log_error(MOD_STACK_FMT "mirror requesting tag content outside of a foreach block", MOD_STACK_ARG);
+      error++;
+      break;
+    }
+    mirror_strings_append(buf, strdup(sf_tag_block->buf));
+    break;
+
+  case MIR_DATA:
+    if (sf_tag_block == NULL) {
+      log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
+      error++;
+      break;
+    }
+    mirror_strings_append(buf, strdup(sf_tag_block->data));
+    break;
+
+  case MIR_DATA_CAPS:
+    if (sf_tag_block == NULL) {
+      log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
+      error++;
+      break;
+    }
+    mirror_strings_append(buf, strcaps(sf_tag_block->data));
+    break;
+
+  case MIR_NS:
+    mirror_strings_append(buf, strdup(mod_stack_global()->ns));
+    break;
+
+  case MIR_NS_CAPS:
+    mirror_strings_append(buf, strcaps(mod_stack_global()->ns));
+    break;
+
+  case MIR_ALPHA_SWITCH:
+    mirror_strings_append(buf, strdup("// TODO"));
+    break;
+  }
 
   return error;
 }
 
 int
-reflection_file_write(const struct reflection_file* ref) {
+reflection_foreach_gen(struct mirror_strings* bufs, const char* tag, const struct serial_files* sf,
+                       const struct mirror_format_token* token) {
   int error = 0;
 
-  char* path = malloc(strlen(END_REF_SRC_DIR "/ref/") + strlen(ref->name) + 1);
+  for (size_t i = 0; i < sf->len; i++) {
+    error += reflection_foreach_perfile_gen(bufs + i, tag, sf->arr + i, token);
+  }
+
+  return error;
+}
+
+int
+reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
+  int error = 0;
+
+  char* foreach_tag = NULL;
+  bool in_foreach = false;
+
+  struct mirror_strings* foreach_bufs = malloc(sf->len * sizeof(struct mirror_strings));
+  for (size_t i = 0; i < sf->len; i++) {
+    foreach_bufs[i].arr = NULL;
+    foreach_bufs[i].len = 0;
+    foreach_bufs[i].cap = 0;
+  }
+
+  const struct mirror_format_tokens* tokens = &ref->mir_file->tokens;
+  for (size_t token_i = 0; token_i < tokens->len; token_i++) {
+    const struct mirror_format_token* token = tokens->arr + token_i;
+
+    if (in_foreach == true) {
+      if (token->type != MIR_FOREACH_END) {
+        error += reflection_foreach_gen(foreach_bufs, foreach_tag, sf, token);
+      } else {
+        in_foreach = false;
+        for (size_t sf_i = 0; sf_i < sf->len; sf_i++) {
+          for (size_t str_i = 0; str_i < foreach_bufs[sf_i].len; str_i++) {
+            mirror_strings_append(&ref->buf, strdup(foreach_bufs[sf_i].arr[str_i]));
+          }
+          mirror_strings_cleanup(foreach_bufs + sf_i);
+          foreach_bufs[sf_i].arr = NULL;
+          foreach_bufs[sf_i].len = 0;
+          foreach_bufs[sf_i].cap = 0;
+        }
+      }
+
+      continue;
+    }
+
+    switch (token->type) {
+    case MIR_CONST:
+      mirror_strings_append(&ref->buf, strdup(token->buf));
+      break;
+
+    case MIR_FOREACH_BEGIN:
+      foreach_tag = token->buf;
+      in_foreach = true;
+      break;
+    }
+  }
+
+  mirror_strings_remove_backslashes(&ref->buf);
+
+  free(foreach_bufs);
+
+  return error;
+}
+
+int
+reflection_out_write(const struct reflection_out* ref) {
+  int error = 0;
+
+  char* path = malloc(strlen(END_REF_SRC_DIR "/ref/") + strlen(ref->mir_file->name) + 1);
   strcpy(path, END_REF_SRC_DIR "/ref/");
-  strcat(path, ref->name);
+  strcat(path, ref->mir_file->name);
 
   FILE* file = fopen(path, "w");
 
@@ -179,37 +193,34 @@ reflection_file_write(const struct reflection_file* ref) {
     return error;
   }
 
-  error += reflection_groups_write(file, &ref->groups);
+  error += mirror_strings_write(file, &ref->buf);
 
   fclose(file);
 
-  log_info("Generating file %s", ref->name);
+  log_info("Generating file %s", ref->mir_file->name);
 
   return error;
 }
 
 int
-reflection_files_gen(struct reflection_files* ref, const struct serial_files* sf) {
+reflection_outs_gen(struct reflection_outs* ref, const struct serial_files* sf) {
   int error = 0;
 
   for (size_t i = 0; i < ref->len; i++) {
-    for (size_t j = 0; j < sf->len; j++) {
-      mod_stack_global()->file = sf->arr[j].name;
-      error += reflection_file_gen(ref->arr + i, sf->arr + j);
-    }
+    error += reflection_out_gen(ref->arr + i, sf);
   }
 
-  error += reflection_files_write(ref);
+  error += reflection_outs_write(ref);
 
   return error;
 }
 
 int
-reflection_files_write(const struct reflection_files* ref) {
+reflection_outs_write(const struct reflection_outs* ref) {
   int error = 0;
 
   for (size_t i = 0; i < ref->len; i++) {
-    error += reflection_file_write(ref->arr + i);
+    error += reflection_out_write(ref->arr + i);
   }
 
   return error;
@@ -218,28 +229,25 @@ reflection_files_write(const struct reflection_files* ref) {
 void
 reflection_cleanup(struct reflection* ref) {
   if (ref == NULL) return;
-  reflection_files_cleanup(&ref->files);
+  reflection_outs_cleanup(&ref->files);
 }
 
 int
 reflection_gen(struct reflection* ref, const struct serial_files* sf) {
   int error = 0;
-  error += reflection_files_gen(&ref->files, sf);
+  error += reflection_outs_gen(&ref->files, sf);
   return error;
 }
 
 void
 reflection_init(struct reflection* ref, const struct mirror* mir) {
   ref->files.len = mir->files.len;
-  ref->files.arr = malloc(ref->files.len * sizeof(struct reflection_file));
+  ref->files.cap = mir->files.cap;
+  ref->files.arr = malloc(ref->files.cap * sizeof(struct reflection_out));
   for (size_t i = 0; i < ref->files.len; i++) {
-    ref->files.arr[i].name = mir->files.arr[i].name;
-    ref->files.arr[i].groups.len = mir->files.arr[i].groups.len;
-    ref->files.arr[i].groups.arr = malloc(ref->files.arr[i].groups.len * sizeof(struct reflection_group));
-    for (size_t j = 0; j < ref->files.arr[i].groups.len; j++) {
-      ref->files.arr[i].groups.arr[j].mir = mir->files.arr[i].groups.arr + j;
-      ref->files.arr[i].groups.arr[j].foreach_buf.arr = NULL;
-      ref->files.arr[i].groups.arr[j].foreach_buf.len = 0;
-    }
+    ref->files.arr[i].mir_file = mir->files.arr + i;
+    ref->files.arr[i].buf.arr = NULL;
+    ref->files.arr[i].buf.len = 0;
+    ref->files.arr[i].buf.cap = 0;
   }
 }

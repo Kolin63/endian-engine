@@ -109,6 +109,7 @@ serial_file_load(struct serial_file* s, const char* file_path, const char* file_
   s->name = NULL;
   s->tags.arr = NULL;
   s->tags.len = 0;
+  s->tags.cap = 0;
 
   if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
 

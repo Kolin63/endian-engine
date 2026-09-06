@@ -1,0 +1,79 @@
+{
+  "id": "functions",
+  "files": [
+    {
+      "name": "functions.h",
+      "format": [
+        "#ifndef ENDIAN_FUNCTIONS_H_",
+        "#define ENDIAN_FUNCTIONS_H_",
+        "",
+        "// namespaces:",
+        {
+          "format": [
+            "// %n (%N)"
+          ]
+        },
+        "",
+        {
+          "tag": "PREPROC",
+          "format": [
+            "%t"
+          ]
+        },
+        "#include \"../src/function.h\"",
+        "",
+        "#endif"
+      ]
+    },
+
+
+
+
+    {
+      "name": "functions.c",
+      "format": [
+        "#include \"functions.h\"",
+        "",
+        "void",
+        "function_call_init() {",
+        {
+          "tag": "function_init",
+          "format": [
+            "{%t}"
+          ]
+        },
+        "}",
+        "",
+        "void",
+        "function_call_load() {",
+        {
+          "tag": "function_load",
+          "format": [
+            "{%t}"
+          ]
+        },
+        "}",
+        "",
+        "void",
+        "function_call_save() {",
+        {
+          "tag": "function_save",
+          "format": [
+            "{%t}"
+          ]
+        },
+        "}",
+        "",
+        "void",
+        "function_call_cleanup() {",
+        {
+          "tag": "function_cleanup",
+          "format": [
+            "{%t}"
+          ]
+        },
+        "}"
+      ]
+    }
+  ]
+}

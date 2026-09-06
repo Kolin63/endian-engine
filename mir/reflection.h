@@ -9,39 +9,24 @@
 #include "serial_file.h"
 #include "../src/endvec.h"
 
-struct reflection_group {
-  const struct mirror_group* mir;
-  struct mirror_strings foreach_buf;
+struct reflection_out {
+  const struct mirror_file* mir_file;
+  struct mirror_strings buf;
 };
 
-ENDVEC_DECLARE(reflection_groups, struct reflection_group);
-
-struct reflection_file {
-  const char* name;
-  struct reflection_groups groups;
-};
-
-ENDVEC_DECLARE(reflection_files, struct reflection_file);
+ENDVEC_DECLARE(reflection_outs, struct reflection_out);
 
 struct reflection {
-  struct reflection_files files;
+  struct reflection_outs files;
 };
 
-void reflection_group_cleanup(struct reflection_group* ref);
-int reflection_group_gen(struct reflection_group* ref, const struct serial_file* sf);
-int reflection_group_write(FILE* file, const struct reflection_group* ref);
+void reflection_out_cleanup(struct reflection_out* ref);
+int reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf);
+int reflection_out_write(const struct reflection_out* ref);
 
-void reflection_groups_cleanup(struct reflection_groups* ref);
-int reflection_groups_gen(struct reflection_groups* ref, const struct serial_file* sf);
-int reflection_groups_write(FILE* file, const struct reflection_groups* ref);
-
-void reflection_file_cleanup(struct reflection_file* ref);
-int reflection_file_gen(struct reflection_file* ref, const struct serial_file* sf);
-int reflection_file_write(const struct reflection_file* ref);
-
-void reflection_files_cleanup(struct reflection_files* ref);
-int reflection_files_gen(struct reflection_files* ref, const struct serial_files* sf);
-int reflection_files_write(const struct reflection_files* ref);
+void reflection_outs_cleanup(struct reflection_outs* ref);
+int reflection_outs_gen(struct reflection_outs* ref, const struct serial_files* sf);
+int reflection_outs_write(const struct reflection_outs* ref);
 
 void reflection_cleanup(struct reflection* ref);
 int reflection_gen(struct reflection* ref, const struct serial_files* sf);

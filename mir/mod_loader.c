@@ -31,7 +31,6 @@ mod_loader_mod_ns_data_dir_load(struct serial_files* files, const char* file_pat
   if (sf->tags.len == 0) {
     serial_file_cleanup(sf);
     files->len--;
-    files->arr = realloc(files->arr, files->len * sizeof(struct serial_file));
   }
 }
 

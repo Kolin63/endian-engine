@@ -16,261 +16,164 @@
 
 static struct mirrors global = {};
 
-ENDVEC_DEFINE(mirror_format_blocks, struct mirror_format_block, mirror_format_block_cleanup(arr->arr + i));
-ENDVEC_DEFINE(mirror_foreach_arr, struct mirror_foreach, mirror_foreach_cleanup(arr->arr + i));
-ENDVEC_DEFINE(mirror_groups, struct mirror_group, mirror_group_cleanup(arr->arr + i));
+ENDVEC_DEFINE(mirror_format_tokens, struct mirror_format_token, mirror_format_token_cleanup(arr->arr + i));
 ENDVEC_DEFINE(mirror_files, struct mirror_file, mirror_file_cleanup(arr->arr + i));
 ENDVEC_DEFINE(mirrors, struct mirror, mirror_cleanup(arr->arr + i));
 
 void
-mirror_format_block_cleanup(struct mirror_format_block* f) {
+mirror_format_token_cleanup(struct mirror_format_token* f) {
   if (f == NULL) return;
-  mirror_strings_cleanup(&f->buf);
+  if (f->buf != NULL) free(f->buf);
 }
 
 int
-mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* jsmn, const char* json) {
+mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line) {
   int error = 0;
+
+  char* line = malloc(strlen(_line) + 2);
+  strcpy(line, _line);
+  strcat(line, "\n");
+
+  struct mirror_format_token* current_token = NULL;
+
+  bool escape = false;
+
+  const size_t linelen = strlen(line);
+  for (size_t i = 0; i < linelen; i++) {
+    if (line[i] == '%') {
+      if (escape == true) {
+        escape = false;
+      } else {
+        escape = true;
+        continue;
+      }
+    }
+
+    if (escape == true) {
+      escape = false;
+      enum mirror_format_token_type type;
+      switch (line[i]) {
+      case 't':
+        type = MIR_TAG_CONTENT;
+        break;
+      case 'd':
+        type = MIR_DATA;
+        break;
+      case 'D':
+        type = MIR_DATA_CAPS;
+        break;
+      case 'n':
+        type = MIR_NS;
+        break;
+      case 'N':
+        type = MIR_NS_CAPS;
+        break;
+      case 'A':
+        type = MIR_ALPHA_SWITCH;
+        break;
+      default:
+        log_error(MOD_STACK_FMT "unknown escape sequence %%%c", MOD_STACK_ARG, line[i]);
+        error++;
+        continue;
+      }
+      mirror_format_tokens_append(f, (struct mirror_format_token){.type = type});
+      current_token = &f->arr[f->len - 1];
+
+      continue;
+    }
+
+    // at this point we are sure the text is of type CONST
+
+    if (current_token == NULL || current_token->type != MIR_CONST) {
+      mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_CONST});
+      current_token = &f->arr[f->len - 1];
+    }
+
+    if (current_token->buf == NULL) {
+      current_token->buf = malloc(linelen + 1);
+      current_token->buf[0] = '\0';
+    }
+
+    char charstr[2] = {line[i], '\0'};
+    strcat(current_token->buf, charstr);
+  }
+
+  free(line);
+
+  return error;
+}
+
+int
+mirror_format_tokens_foreach_line_from_json(struct mirror_format_tokens* f, char* tag, const jsmntok_t* jsmn, const char* json) {
+  int error = 0;
+
+  mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_FOREACH_BEGIN, .buf = tag});
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
-
-  END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
-
-  f->len = 1;
-  f->arr = malloc(sizeof(struct mirror_format_block));
-  struct mirror_format_block* current_block = &f->arr[0];
-  current_block->type = MFBT_NULL;
-  current_block->buf.arr = NULL;
-  current_block->buf.len = 0;
 
   while (jsmn_iterator_next(&iter)) {
     END_JSON_CHECK_STRING(iter);
     char* line = jsmn_iterator_get_string_heap(json, iter.val);
-    const size_t linelen = strlen(line) + 1;
-    line = realloc(line, linelen + 1);
-    strcat(line, "\n");
-
-    bool escape = false;
-
-    for (size_t i = 0; i < linelen; i++) {
-      if (line[i] == '%') {
-        if (escape == true) {
-          escape = false;
-        } else {
-          escape = true;
-          continue;
-        }
-      }
-
-      if (escape == true) {
-        escape = false;
-        enum mirror_format_block_type type;
-        switch (line[i]) {
-        case 't':
-          type = MFBT_TAG_CONTENT;
-          break;
-        case 'd':
-          type = MFBT_DATA;
-          break;
-        case 'D':
-          type = MFBT_DATA_CAPS;
-          break;
-        case 'n':
-          type = MFBT_NS;
-          break;
-        case 'N':
-          type = MFBT_NS_CAPS;
-          break;
-        case 'A':
-          type = MFBT_ALPHA_SWITCH;
-          break;
-        default:
-          log_error(MOD_STACK_FMT "unknown escape sequence %%%c", MOD_STACK_ARG, line[i]);
-          error++;
-          continue;
-        }
-        if (current_block->type != MFBT_NULL) {
-          mirror_format_blocks_append(f, (struct mirror_format_block){});
-          current_block = &f->arr[f->len - 1];
-        }
-        current_block->type = type;
-        current_block->buf.len = 0;
-        current_block->buf.arr = NULL;
-
-        continue;
-      }
-
-      // at this point we are sure the text is of type CONST
-
-      if (current_block->type != MFBT_CONST) {
-        if (current_block->type != MFBT_NULL) {
-          mirror_format_blocks_append(f, (struct mirror_format_block){});
-          current_block = &f->arr[f->len - 1];
-        }
-        current_block->type = MFBT_CONST;
-        current_block->buf.len = 0;
-        current_block->buf.arr = NULL;
-      }
-
-      if (current_block->buf.arr == NULL || current_block->buf.len == 0) {
-        mirror_strings_append(&current_block->buf, NULL);
-      }
-
-      char* bufstr = current_block->buf.arr[current_block->buf.len - 1];
-
-      if (bufstr == NULL) {
-        current_block->buf.arr[current_block->buf.len - 1] = malloc(linelen + 1);
-        current_block->buf.arr[current_block->buf.len - 1][0] = '\0';
-        bufstr = current_block->buf.arr[current_block->buf.len - 1];
-      }
-
-      char charstr[2] = {line[i], '\0'};
-      strcat(bufstr, charstr);
-    }
-
+    error += mirror_format_tokens_from_line(f, line);
     free(line);
-
-    if (current_block->type == MFBT_CONST) {
-      mirror_strings_append(&current_block->buf, NULL);
-    }
   }
+
+  mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_FOREACH_END});
 
   return error;
 }
 
-void
-mirror_foreach_cleanup(struct mirror_foreach* f) {
-  free(f->tag);
-  mirror_format_blocks_cleanup(&f->format);
-}
-
 int
-mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json) {
+mirror_format_tokens_foreach_from_json(struct mirror_format_tokens* f, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
-
-  f->tag = NULL;
-  f->format.arr = NULL;
-  f->format.len = 0;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_OBJECT_RET(iter, error++; return error);
+  char* tag = NULL;
+  const jsmntok_t* format_arr = NULL;
 
   while (jsmn_iterator_next(&iter)) {
     if (strcmp(iter.key, "tag") == 0) {
       END_JSON_CHECK_STRING(iter);
-      f->tag = jsmn_iterator_get_string_heap(json, iter.val);
+      tag = jsmn_iterator_get_string_heap(json, iter.val);
     } else if (strcmp(iter.key, "format") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      int this_error = mirror_format_blocks_from_json(&f->format, iter.val, json);
-      if (this_error != 0) {
-        error += this_error;
-      } else {
-        for (size_t i = 0; i < f->format.len; i++) {
-          mirror_strings_remove_backslashes(&f->format.arr[i].buf);
-        }
-      }
+      format_arr = iter.val;
     } else {
+      log_error(MOD_STACK_FMT "unknown foreach key %s", MOD_STACK_ARG, iter.key);
       error++;
-      log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);
     }
   }
 
-  return error;
-}
-
-int
-mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* jsmn, const char* json) {
-  int error = 0;
-
-  arr->arr = NULL;
-  arr->len = 0;
-
-  struct jsmn_iterator iter;
-  jsmn_iterator_init(&iter, jsmn, json);
-
-  END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
-
-  while (jsmn_iterator_next(&iter)) {
-    mirror_foreach_arr_append(arr, (struct mirror_foreach){});
-    error += mirror_foreach_from_json(&arr->arr[arr->len - 1], iter.val, json);
+  if (format_arr != NULL) {
+    error += mirror_format_tokens_foreach_line_from_json(f, tag, format_arr, json);
   }
 
   return error;
 }
 
-void
-mirror_group_cleanup(struct mirror_group* g) {
-  if (g == NULL) return;
-  mirror_strings_cleanup(&g->prefix);
-  mirror_foreach_arr_cleanup(&g->foreach);
-  mirror_strings_cleanup(&g->postfix);
-}
-
 int
-mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char* json) {
+mirror_format_tokens_from_json(struct mirror_format_tokens* f, const jsmntok_t* jsmn, const char* json) {
   int error = 0;
-
-  g->prefix.arr = NULL;
-  g->prefix.len = 0;
-  g->foreach.arr = NULL;
-  g->foreach.len = 0;
-  g->postfix.arr = NULL;
-  g->postfix.len = 0;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
 
-  END_JSON_CHECK_OBJECT_RET(iter, error++; return error);
-
   while (jsmn_iterator_next(&iter)) {
-    if (strcmp(iter.key, "prefix") == 0) {
-      END_JSON_CHECK_ARRAY(iter);
-      int this_error = mirror_strings_from_json(&g->prefix, iter.val, json);
-      if (this_error != 0) {
-        error += this_error;
-      } else {
-        mirror_strings_remove_backslashes(&g->prefix);
-        mirror_strings_append_newline_to_all(&g->prefix);
-      }
-    } else if (strcmp(iter.key, "foreach") == 0) {
-      END_JSON_CHECK_ARRAY(iter);
-      error += mirror_foreach_arr_from_json(&g->foreach, iter.val, json);
-    } else if (strcmp(iter.key, "postfix") == 0) {
-      END_JSON_CHECK_ARRAY(iter);
-      int this_error = mirror_strings_from_json(&g->postfix, iter.val, json);
-      if (this_error != 0) {
-        error += this_error;
-      } else {
-        mirror_strings_remove_backslashes(&g->postfix);
-        mirror_strings_append_newline_to_all(&g->postfix);
-      }
+    if (iter.val->type == JSMN_STRING) {
+      END_JSON_CHECK_STRING(iter);
+      char* line = jsmn_iterator_get_string_heap(json, iter.val);
+      error += mirror_format_tokens_from_line(f, line);
+      free(line);
+    } else if (iter.val->type == JSMN_OBJECT) {
+      END_JSON_CHECK_OBJECT(iter);
+      error += mirror_format_tokens_foreach_from_json(f, iter.val, json);
     } else {
+      log_error(MOD_STACK_FMT "format tokens must either be STRING or OBJECT", MOD_STACK_ARG);
       error++;
-      log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);
     }
-  }
-
-  return error;
-}
-
-int
-mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const char* json) {
-  int error = 0;
-
-  arr->arr = NULL;
-  arr->len = 0;
-
-  struct jsmn_iterator iter;
-  jsmn_iterator_init(&iter, jsmn, json);
-
-  END_JSON_CHECK_ARRAY_RET(iter, error++; return error);
-
-  while (jsmn_iterator_next(&iter)) {
-    mirror_groups_append(arr, (struct mirror_group){});
-    error += mirror_group_from_json(&arr->arr[arr->len - 1], iter.val, json);
   }
 
   return error;
@@ -280,7 +183,7 @@ void
 mirror_file_cleanup(struct mirror_file* f) {
   if (f == NULL) return;
   free(f->name);
-  mirror_groups_cleanup(&f->groups);
+  mirror_format_tokens_cleanup(&f->tokens);
 }
 
 int
@@ -288,8 +191,16 @@ mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* 
   int error = 0;
 
   f->name = NULL;
-  f->groups.arr = NULL;
-  f->groups.len = 0;
+  f->tokens.arr = NULL;
+  f->tokens.len = 0;
+  f->tokens.cap = 0;
+
+  mirror_format_tokens_append(
+      &f->tokens,
+      (struct mirror_format_token){
+          .type = MIR_CONST,
+          .buf = strdup("// THIS FILE IS AUTOGENERATED BY THE REFLECTOR. DO NOT EDIT\n\n"),
+      });
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
@@ -300,9 +211,9 @@ mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* 
     if (strcmp(iter.key, "name") == 0) {
       END_JSON_CHECK_STRING(iter);
       f->name = jsmn_iterator_get_string_heap(json, iter.val);
-    } else if (strcmp(iter.key, "groups") == 0) {
+    } else if (strcmp(iter.key, "format") == 0) {
       END_JSON_CHECK_ARRAY(iter);
-      error += mirror_groups_from_json(&f->groups, iter.val, json);
+      error += mirror_format_tokens_from_json(&f->tokens, iter.val, json);
     } else {
       error++;
       log_error(MOD_STACK_FMT "Unknown object %s", MOD_STACK_ARG, iter.key);
@@ -318,6 +229,7 @@ mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const ch
 
   arr->arr = NULL;
   arr->len = 0;
+  arr->cap = 0;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);
@@ -346,6 +258,7 @@ mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) {
   m->id = NULL;
   m->files.arr = NULL;
   m->files.len = 0;
+  m->files.cap = 0;
 
   struct jsmn_iterator iter;
   jsmn_iterator_init(&iter, jsmn, json);

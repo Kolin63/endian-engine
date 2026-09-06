@@ -9,42 +9,28 @@
 #include "mirror_strings.h"
 #include "../src/endvec.h"
 
-enum mirror_format_block_type {
-  MFBT_NULL,
-  MFBT_CONST,
-  MFBT_TAG_CONTENT,   // %t
-  MFBT_DATA,          // %d
-  MFBT_DATA_CAPS,     // %D
-  MFBT_NS,            // %n
-  MFBT_NS_CAPS,       // %N
-  MFBT_ALPHA_SWITCH,  // %A
+enum mirror_format_token_type {
+  MIR_CONST,
+  MIR_FOREACH_BEGIN, // the tag for the block is stored in buf
+  MIR_FOREACH_END,
+  MIR_TAG_CONTENT,   // %t
+  MIR_DATA,          // %d
+  MIR_DATA_CAPS,     // %D
+  MIR_NS,            // %n
+  MIR_NS_CAPS,       // %N
+  MIR_ALPHA_SWITCH,  // %A
 };
 
-struct mirror_format_block {
-  enum mirror_format_block_type type;
-  struct mirror_strings buf;
+struct mirror_format_token {
+  enum mirror_format_token_type type;
+  char* buf;
 };
 
-ENDVEC_DECLARE(mirror_format_blocks, struct mirror_format_block);
-
-struct mirror_foreach {
-  char* tag;
-  struct mirror_format_blocks format;
-};
-
-ENDVEC_DECLARE(mirror_foreach_arr, struct mirror_foreach);
-
-struct mirror_group {
-  struct mirror_strings prefix;
-  struct mirror_foreach_arr foreach;
-  struct mirror_strings postfix;
-};
-
-ENDVEC_DECLARE(mirror_groups, struct mirror_group);
+ENDVEC_DECLARE(mirror_format_tokens, struct mirror_format_token);
 
 struct mirror_file {
   char* name;
-  struct mirror_groups groups;
+  struct mirror_format_tokens tokens;
 };
 
 ENDVEC_DECLARE(mirror_files, struct mirror_file);
@@ -56,22 +42,10 @@ struct mirror {
 
 ENDVEC_DECLARE(mirrors, struct mirror);
 
-void mirror_format_block_cleanup(struct mirror_format_block* f);
+void mirror_format_token_cleanup(struct mirror_format_token* f);
 
-void mirror_format_blocks_cleanup(struct mirror_format_blocks* f);
-int mirror_format_blocks_from_json(struct mirror_format_blocks* f, const jsmntok_t* jsmn, const char* json);
-
-void mirror_foreach_cleanup(struct mirror_foreach* f);
-int mirror_foreach_from_json(struct mirror_foreach* f, const jsmntok_t* jsmn, const char* json);
-
-void mirror_foreach_arr_cleanup(struct mirror_foreach_arr* arr);
-int mirror_foreach_arr_from_json(struct mirror_foreach_arr* arr, const jsmntok_t* jsmn, const char* json);
-
-void mirror_group_cleanup(struct mirror_group* g);
-int mirror_group_from_json(struct mirror_group* g, const jsmntok_t* jsmn, const char* json);
-
-void mirror_groups_cleanup(struct mirror_groups* arr);
-int mirror_groups_from_json(struct mirror_groups* arr, const jsmntok_t* jsmn, const char* json);
+void mirror_format_tokens_cleanup(struct mirror_format_tokens* f);
+int mirror_format_tokens_from_json(struct mirror_format_tokens* f, const jsmntok_t* jsmn, const char* json);
 
 void mirror_file_cleanup(struct mirror_file* f);
 int mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* json);

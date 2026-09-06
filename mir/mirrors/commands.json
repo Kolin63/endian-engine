@@ -1,0 +1,106 @@
+{
+  "id": "commands",
+  "files": [
+    {
+      "name": "commands.h",
+      "format": [
+        "#ifndef ENDIAN_COMMANDS_H_",
+        "#define ENDIAN_COMMANDS_H_",
+        "",
+        {
+          "tag": "PREPROC",
+          "format": [
+            "%t"
+          ]
+        },
+        "#include \"../src/command.h\"",
+        "",
+
+
+        "enum command_id {",
+        "  COMMAND_UNKNOWN_,",
+        {
+          "tag": "command",
+          "format": [
+            "  COMMAND_%D,"
+          ]
+        },
+        "};",
+        "",
+        "const static struct command commands[] = {",
+        "",
+        {
+          "tag": "command",
+          "format": [
+            "[COMMAND_%D] = %t,"
+          ]
+        },
+        "};",
+        "",
+        {
+          "tag": "command_cb",
+          "format": [
+            "void %d_cb(struct discord* client, const struct discord_interaction* event);",
+            ""
+          ]
+        },
+        "#endif"
+      ]
+    },
+
+
+
+
+    {
+      "name": "commands.c",
+      "format": [
+        "#include \"commands.h\"",
+        "",
+        {
+          "tag": "command_cb",
+          "format": [
+            "void",
+            "%d_cb(struct discord* client, const struct discord_interaction* event) %t"
+          ]
+        },
+        "enum command_id",
+        "command_id_get(const char* str) {",
+        {
+          "tag": "command",
+          "format": [
+            "%A",
+            "%d",
+            "%A",
+            "return COMMAND_%D",
+            "%A",
+            "return COMMAND_UNKNOWN_;",
+            "%A"
+          ]
+        },
+        "}",
+        "",
+        "void",
+        "command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event) {",
+        "  switch (id) {",
+        {
+          "tag": "command_cb",
+          "format": [
+            "  case COMMAND_%D: %d_cb(client, event); return;"
+          ]
+        },
+        "  }",
+        "}",
+        "",
+        "void",
+        "command_create_all(const struct discord_ready* event) {",
+        {
+          "tag": "command",
+          "format": [
+            "  command_create(&commands[COMMAND_%D], event);"
+          ]
+        },
+        "}"
+      ]
+    }
+  ]
+}

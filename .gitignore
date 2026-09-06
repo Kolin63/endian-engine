@@ -15,4 +15,5 @@
 !mir
 !mir/*.c
 !mir/*.h
-!mir/core/*.h
+!mir/mirrors
+!mir/mirrors/*.json
