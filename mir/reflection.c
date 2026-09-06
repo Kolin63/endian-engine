@@ -8,9 +8,9 @@
 
 #include "mirror.h"
 #include "serial_file.h"
-#include "strings.h"
 #include "mod_stack.h"
 #include "../src/fileio.h"
+#include "alpha_switch.h"
 
 ENDVEC_DEFINE(reflection_outs, struct reflection_out, reflection_out_cleanup(arr->arr + i));
 
@@ -37,9 +37,11 @@ reflection_out_cleanup(struct reflection_out* ref) {
 }
 
 int
-reflection_foreach_perfile_gen(struct mirror_strings* buf, const char* tag, const struct serial_file* sf,
-                               const struct mirror_format_token* token) {
+reflection_foreach_perfile_gen(struct reflection_out* ref, const struct mirror_format_tokens* tokens, const struct serial_file* sf) {
   int error = 0;
+
+  const char* tag = tokens->arr[-1].buf;
+  struct mirror_strings* buf = &ref->buf;
 
   struct serial_file_tag* sf_tag_block = NULL;
   if (tag != NULL) {
@@ -54,66 +56,96 @@ reflection_foreach_perfile_gen(struct mirror_strings* buf, const char* tag, cons
     }
   }
 
-  switch (token->type) {
-  case MIR_CONST:
-    mirror_strings_append(buf, strdup(token->buf));
-    break;
+  for (size_t token_i = 0; token_i < tokens->len; token_i++) {
+    const struct mirror_format_token* token = tokens->arr + token_i;
+    switch (token->type) {
+    case MIR_CONST:
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, token->buf);
+        break;
+      }
+      mirror_strings_append(buf, strdup(token->buf));
+      break;
 
-  case MIR_FOREACH_BEGIN:
-    log_error(MOD_STACK_FMT "unexpected MIR_FOREACH_BEGIN in already begun foreach", MOD_STACK_ARG);
-    error++;
-    break;
-
-  case MIR_TAG_CONTENT:
-    if (sf_tag_block == NULL) {
-      log_error(MOD_STACK_FMT "mirror requesting tag content outside of a foreach block", MOD_STACK_ARG);
+    case MIR_FOREACH_BEGIN:
+      log_error(MOD_STACK_FMT "unexpected MIR_FOREACH_BEGIN in already begun foreach", MOD_STACK_ARG);
       error++;
       break;
-    }
-    mirror_strings_append(buf, strdup(sf_tag_block->buf));
-    break;
 
-  case MIR_DATA:
-    if (sf_tag_block == NULL) {
-      log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
-      error++;
+    case MIR_TAG_CONTENT:
+      if (sf_tag_block == NULL) {
+        log_error(MOD_STACK_FMT "mirror requesting tag content outside of a foreach block", MOD_STACK_ARG);
+        error++;
+        break;
+      }
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, sf_tag_block->buf);
+        break;
+      }
+      mirror_strings_append(buf, strdup(sf_tag_block->buf));
+      break;
+
+    case MIR_DATA:
+      if (sf_tag_block == NULL) {
+        log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
+        error++;
+        break;
+      }
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, sf_tag_block->data);
+        break;
+      }
+      mirror_strings_append(buf, strdup(sf_tag_block->data));
+      break;
+
+    case MIR_DATA_CAPS:
+      if (sf_tag_block == NULL) {
+        log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
+        error++;
+        break;
+      }
+      if (ref->alpha.escapes_encountered > 0) {
+        char* caps = strcaps(sf_tag_block->data);
+        alpha_switch_fillout(&ref->alpha, caps);
+        free(caps);
+        break;
+      }
+      mirror_strings_append(buf, strcaps(sf_tag_block->data));
+      break;
+
+    case MIR_NS:
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, mod_stack_global()->ns);
+        break;
+      }
+      mirror_strings_append(buf, strdup(mod_stack_global()->ns));
+      break;
+
+    case MIR_NS_CAPS:
+      if (ref->alpha.escapes_encountered > 0) {
+        char* caps = strcaps(mod_stack_global()->ns);
+        alpha_switch_fillout(&ref->alpha, caps);
+        free(caps);
+        break;
+      }
+      mirror_strings_append(buf, strcaps(mod_stack_global()->ns));
+      break;
+
+    case MIR_ALPHA_SWITCH:
+      ref->alpha.escapes_encountered++;
       break;
     }
-    mirror_strings_append(buf, strdup(sf_tag_block->data));
-    break;
-
-  case MIR_DATA_CAPS:
-    if (sf_tag_block == NULL) {
-      log_error(MOD_STACK_FMT "mirror requesting tag data outside of a foreach block", MOD_STACK_ARG);
-      error++;
-      break;
-    }
-    mirror_strings_append(buf, strcaps(sf_tag_block->data));
-    break;
-
-  case MIR_NS:
-    mirror_strings_append(buf, strdup(mod_stack_global()->ns));
-    break;
-
-  case MIR_NS_CAPS:
-    mirror_strings_append(buf, strcaps(mod_stack_global()->ns));
-    break;
-
-  case MIR_ALPHA_SWITCH:
-    mirror_strings_append(buf, strdup("// TODO"));
-    break;
   }
 
   return error;
 }
 
 int
-reflection_foreach_gen(struct mirror_strings* bufs, const char* tag, const struct serial_files* sf,
-                       const struct mirror_format_token* token) {
+reflection_foreach_gen(struct reflection_out* ref, const struct mirror_format_tokens* tokens, const struct serial_files* sf) {
   int error = 0;
 
   for (size_t i = 0; i < sf->len; i++) {
-    error += reflection_foreach_perfile_gen(bufs + i, tag, sf->arr + i, token);
+    error += reflection_foreach_perfile_gen(ref, tokens, sf->arr + i);
   }
 
   return error;
@@ -123,35 +155,24 @@ int
 reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
   int error = 0;
 
-  char* foreach_tag = NULL;
   bool in_foreach = false;
-
-  struct mirror_strings* foreach_bufs = malloc(sf->len * sizeof(struct mirror_strings));
-  for (size_t i = 0; i < sf->len; i++) {
-    foreach_bufs[i].arr = NULL;
-    foreach_bufs[i].len = 0;
-    foreach_bufs[i].cap = 0;
-  }
+  struct mirror_format_tokens foreach_block = {};
 
   const struct mirror_format_tokens* tokens = &ref->mir_file->tokens;
   for (size_t token_i = 0; token_i < tokens->len; token_i++) {
     const struct mirror_format_token* token = tokens->arr + token_i;
 
     if (in_foreach == true) {
-      if (token->type != MIR_FOREACH_END) {
-        error += reflection_foreach_gen(foreach_bufs, foreach_tag, sf, token);
-      } else {
-        in_foreach = false;
-        for (size_t sf_i = 0; sf_i < sf->len; sf_i++) {
-          for (size_t str_i = 0; str_i < foreach_bufs[sf_i].len; str_i++) {
-            mirror_strings_append(&ref->buf, strdup(foreach_bufs[sf_i].arr[str_i]));
-          }
-          mirror_strings_cleanup(foreach_bufs + sf_i);
-          foreach_bufs[sf_i].arr = NULL;
-          foreach_bufs[sf_i].len = 0;
-          foreach_bufs[sf_i].cap = 0;
-        }
-      }
+      if (token->type != MIR_FOREACH_END) continue;
+
+      foreach_block.len = token - foreach_block.arr;
+      error += reflection_foreach_gen(ref, &foreach_block, sf);
+      error += alpha_switch_gen(&ref->buf, &ref->alpha);
+
+      alpha_switch_cleanup(&ref->alpha);
+      foreach_block.arr = NULL;
+      foreach_block.len = 0;
+      in_foreach = false;
 
       continue;
     }
@@ -162,15 +183,20 @@ reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
       break;
 
     case MIR_FOREACH_BEGIN:
-      foreach_tag = token->buf;
       in_foreach = true;
+      foreach_block.arr = (struct mirror_format_token*)(token + 1);
+      ref->alpha.escapes_encountered = 0;
+      ref->alpha.switch_on = NULL;
+      ref->alpha.cases.arr = NULL;
+      ref->alpha.cases.len = 0;
+      ref->alpha.def.arr = NULL;
+      ref->alpha.def.len = 0;
+      ref->alpha.buf = NULL;
       break;
     }
   }
 
   mirror_strings_remove_backslashes(&ref->buf);
-
-  free(foreach_bufs);
 
   return error;
 }
