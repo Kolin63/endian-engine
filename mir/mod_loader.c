@@ -56,7 +56,7 @@ mod_loader_mod_ns_data_load(const char* file_path, const char* file_name) {
 
 void
 mod_loader_mod_ns_load(const char* file_path) {
-  mod_dir_load(file_path, "", mod_stack_global()->ns = file_name; mod_loader_mod_ns_data_load(file_path, file_name));
+  mod_dir_load(file_path, "", mod_stack_global()->file = file_name; mod_loader_mod_ns_data_load(file_path, file_name));
 }
 
 void
