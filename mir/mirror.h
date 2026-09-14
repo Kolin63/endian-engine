@@ -16,6 +16,8 @@ enum mirror_format_token_type {
   MIR_TAG_CONTENT,   // %t
   MIR_DATA,          // %d
   MIR_DATA_CAPS,     // %D
+  MIR_MOD,           // %m
+  MIR_MOD_CAPS,      // %M
   MIR_NS,            // %n
   MIR_NS_CAPS,       // %N
   MIR_ALPHA_SWITCH,  // %A

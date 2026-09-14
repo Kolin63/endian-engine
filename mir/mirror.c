@@ -62,6 +62,12 @@ mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line
       case 'D':
         type = MIR_DATA_CAPS;
         break;
+      case 'm':
+        type = MIR_MOD;
+        break;
+      case 'M':
+        type = MIR_MOD_CAPS;
+        break;
       case 'n':
         type = MIR_NS;
         break;

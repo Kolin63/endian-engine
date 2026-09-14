@@ -113,6 +113,24 @@ reflection_foreach_perfile_gen(struct reflection_out* ref, const struct mirror_f
       mirror_strings_append(buf, strcaps(sf_tag_block->data));
       break;
 
+    case MIR_MOD:
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, mod_stack_global()->mod);
+        break;
+      }
+      mirror_strings_append(buf, strdup(mod_stack_global()->mod));
+      break;
+
+    case MIR_MOD_CAPS:
+      if (ref->alpha.escapes_encountered > 0) {
+        char* caps = strcaps(mod_stack_global()->mod);
+        alpha_switch_fillout(&ref->alpha, caps);
+        free(caps);
+        break;
+      }
+      mirror_strings_append(buf, strcaps(mod_stack_global()->mod));
+      break;
+
     case MIR_NS:
       if (ref->alpha.escapes_encountered > 0) {
         alpha_switch_fillout(&ref->alpha, mod_stack_global()->ns);
