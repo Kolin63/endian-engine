@@ -7,13 +7,6 @@
         "#ifndef ENDIAN_FUNCTIONS_H_",
         "#define ENDIAN_FUNCTIONS_H_",
         "",
-        "// namespaces:",
-        {
-          "format": [
-            "// %n (%N)"
-          ]
-        },
-        "",
         {
           "tag": "PREPROC",
           "format": [
@@ -34,12 +27,52 @@
       "format": [
         "#include \"functions.h\"",
         "",
+        {
+          "tag": "function_init",
+          "format": [
+            "void",
+            "function_call_init_%m_%d() {",
+            "%t",
+            "}",
+            ""
+          ]
+        },
+        {
+          "tag": "function_load",
+          "format": [
+            "void",
+            "function_call_load_%m_%d() {",
+            "%t",
+            "}",
+            ""
+          ]
+        },
+        {
+          "tag": "function_save",
+          "format": [
+            "void",
+            "function_call_save_%m_%d() {",
+            "%t",
+            "}",
+            ""
+          ]
+        },
+        {
+          "tag": "function_cleanup",
+          "format": [
+            "void",
+            "function_call_cleanup_%m_%d() {",
+            "%t",
+            "}",
+            ""
+          ]
+        },
         "void",
         "function_call_init() {",
         {
           "tag": "function_init",
           "format": [
-            "{%t}"
+            "function_call_init_%m_%d();"
           ]
         },
         "}",
@@ -49,7 +82,7 @@
         {
           "tag": "function_load",
           "format": [
-            "{%t}"
+            "function_call_load_%m_%d();"
           ]
         },
         "}",
@@ -59,7 +92,7 @@
         {
           "tag": "function_save",
           "format": [
-            "{%t}"
+            "function_call_save_%m_%d();"
           ]
         },
         "}",
@@ -69,7 +102,7 @@
         {
           "tag": "function_cleanup",
           "format": [
-            "{%t}"
+            "function_call_cleanup_%m_%d();"
           ]
         },
         "}"
