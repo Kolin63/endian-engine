@@ -11,6 +11,10 @@ set_target_properties(concord PROPERTIES
 
 project(reflector C)
 
+if (NOT END_INSTANCE)
+  message(SEND_ERROR "END_INSTANCE must be defined (cmake . -DEND_INSTANCE=...)")
+endif()
+
 file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/fileio.c")
 
 add_executable(reflector ${REFLECTOR_SRC})
