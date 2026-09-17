@@ -85,6 +85,7 @@ mod_loader_load_mods() {
 
   if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") +
       fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include") +
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/ref") +
       fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi") +
       fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi/ref") != 0) {
     log_error("Could not make hardlink directories");
@@ -107,6 +108,7 @@ mod_loader_load_mods() {
 
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(file_path));
 
+  mod_dir_load(END_REF_SRC_DIR, "ref", linker_link_headers_only(file_path, "ref/include", "ref", file_name));
   mod_dir_load(END_REF_SRC_DIR, "ref", linker_link_headers_only(file_path, "ref/include/endapi", "ref", file_name));
 
   free(instance_dir);
