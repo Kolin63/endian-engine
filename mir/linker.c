@@ -39,8 +39,6 @@ linker_link(const char* old, const char* relative_dir, const char* new_dir, cons
     return 1;
   }
 
-  log_info("Making hardlink to %s/%s/%s", relative_dir, new_dir, new_name);
-
   free(path);
   return 0;
 }
