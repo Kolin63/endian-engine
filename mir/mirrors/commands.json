@@ -7,12 +7,8 @@
         "#ifndef ENDIAN_COMMANDS_H_",
         "#define ENDIAN_COMMANDS_H_",
         "",
-        {
-          "tag": "PREPROC",
-          "format": [
-            "%t"
-          ]
-        },
+        "__PREPROC__",
+        "",
         "#include \"../src/command.h\"",
         "",
 
@@ -62,8 +58,7 @@
           "tag": "command_cb",
           "format": [
             "void",
-            "%d_cb(struct discord* client, const struct discord_interaction* event) {",
-            "%t}"
+            "%d_cb(struct discord* client, const struct discord_interaction* event) {%t}"
           ]
         },
         "enum command_id",

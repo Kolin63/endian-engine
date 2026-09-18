@@ -7,12 +7,8 @@
         "#ifndef ENDIAN_FUNCTIONS_H_",
         "#define ENDIAN_FUNCTIONS_H_",
         "",
-        {
-          "tag": "PREPROC",
-          "format": [
-            "%t"
-          ]
-        },
+        "__PREPROC__",
+        "",
         "#include \"../src/function.h\"",
         "",
         "#endif"

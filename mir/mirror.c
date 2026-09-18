@@ -30,6 +30,15 @@ int
 mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line) {
   int error = 0;
 
+  if (strcmp(_line, "__PREPROC__") == 0) {
+    mirror_format_tokens_append(f, (struct mirror_format_token){
+                                       .type = MIR_FOREACH_BEGIN,
+                                       .buf = strdup("PREPROC")});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_TAG_CONTENT});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_FOREACH_END});
+    return error;
+  }
+
   char* line = malloc(strlen(_line) + 2);
   strcpy(line, _line);
   strcat(line, "\n");
