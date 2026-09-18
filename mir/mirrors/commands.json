@@ -56,11 +56,14 @@
       "format": [
         "#include \"commands.h\"",
         "",
+        "#include \"endapi/get_command_options.h\"",
+        "",
         {
           "tag": "command_cb",
           "format": [
             "void",
-            "%d_cb(struct discord* client, const struct discord_interaction* event) %t"
+            "%d_cb(struct discord* client, const struct discord_interaction* event) {",
+            "%t}"
           ]
         },
         "enum command_id",
