@@ -16,7 +16,7 @@ save_write(const char* ns, const char* dir, const char* file,
            const char* ext, const char* content) {
   char* path = malloc(strlen(INSTANCE_DIR) + 6 + strlen(ns) +
                       1 + strlen(dir) + 1 + strlen(file) + 1 + strlen(ext) + 1);
-  strcat(path, INSTANCE_DIR "/saves/");
+  strcpy(path, INSTANCE_DIR "/save/");
   strcat(path, ns);
 
   if (fileio_ensure_dir_exists(path) != 0) {
@@ -40,6 +40,7 @@ save_write(const char* ns, const char* dir, const char* file,
   FILE* file_handle = fopen(path, "w");
   if (file_handle == NULL) {
     log_error("Could not open file %s for writing. Tried to write: %s", path, content);
+    free(path);
     return 2;
   }
 
@@ -49,14 +50,14 @@ save_write(const char* ns, const char* dir, const char* file,
   return 0;
 }
 
-// predir should be "saves" or "mods/modname/data/rom"
+// predir should be "save" or "mods/modname/data/rom"
 int
 save_or_rom_read(const char* predir, const char* ns, const char* dir,
                  const char* file, const char* ext, char** out) {
   char* path = malloc(strlen(INSTANCE_DIR) + 1 +
                       strlen(predir) + 1 + strlen(ns) + 1 + strlen(dir) + 1 +
                       strlen(file) + 1 + strlen(ext) + 1);
-  strcat(path, INSTANCE_DIR "/");
+  strcpy(path, INSTANCE_DIR "/");
   strcat(path, predir);
   strcat(path, "/");
   strcat(path, ns);
@@ -65,6 +66,7 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
   FILE* dir_check = fopen(path, "r");
   if (dir_check == NULL) {
     log_error("Directory %s does not exist", path);
+    free(path);
     return 1;
   }
   fclose(dir_check);
@@ -73,9 +75,10 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
   strcat(path, dir);
 
   // check that the namespace/dir directory exists
-  fopen(path, "r");
+  dir_check = fopen(path, "r");
   if (dir_check == NULL) {
     log_error("Directory %s does not exist", path);
+    free(path);
     return 1;
   }
   fclose(dir_check);
@@ -89,6 +92,7 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
   FILE* file_handle = fopen(path, "r");
   if (file_handle == NULL) {
     log_error("File %s does not exist", path);
+    free(path);
     return 2;
   }
 
@@ -102,5 +106,5 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
 int
 save_read(const char* ns, const char* dir, const char* file,
           const char* ext, char** out) {
-  return save_or_rom_read("saves", ns, dir, file, ext, out);
+  return save_or_rom_read("save", ns, dir, file, ext, out);
 }
