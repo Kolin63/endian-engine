@@ -1,24 +1,37 @@
 #ifndef ENDIAN_GET_COMMAND_OPTIONS_H_
 #define ENDIAN_GET_COMMAND_OPTIONS_H_
 
+#include <stddef.h>
 #include <string.h>
 
 #include <concord/discord.h>
 #include <concord/discord_codecs.h>
 
-#define BEGIN_GET_COMMAND_OPTIONS(discord_interaction)        \
-  if (event->data->options != NULL) {                         \
-    for (int i = 0; i < event->data->options->size; i++) {    \
-      const char* name = event->data->options->array[i].name; \
-      char* value = event->data->options->array[i].value;     \
-                                                              \
-      if (false) {                                            \
-      }
+static inline bool
+_get_cmd_opts_set(char** var, char* str) {
+  *var = str;
+  return true;
+}
 
-#define GET_COMMAND_OPTION(option_name) else if (strcmp(name, option_name) == 0)
+#define GET_COMMAND_OPTIONS(_discord_interaction)                               \
+  if (_discord_interaction->data->options != NULL)                              \
+    for (char *i = 0, *value = NULL, *_inter_cpy = (void*)_discord_interaction; \
+         (size_t)i < _discord_interaction->data->options->size;                 \
+         i++)
 
-#define END_GET_COMMAND_OPTIONS(discord_interaction) \
-  }                                                  \
-  }
+// clang-format off
+#define GET_COMMAND_OPTION(option_name) \
+  if ( \
+      strcmp( \
+        ((struct discord_interaction*)_inter_cpy)->data->options->array[(size_t)i].name, \
+        option_name \
+      ) == 0 \
+      && \
+      _get_cmd_opts_set( \
+        &value, \
+        ((struct discord_interaction*)_inter_cpy)->data->options->array[(size_t)i].value \
+      ) == true \
+    )
+// clang-format on
 
 #endif
