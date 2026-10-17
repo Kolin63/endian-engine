@@ -21,18 +21,28 @@ serial_file_tag_cleanup(struct serial_file_tag* x) {
   if (x->buf != NULL) free(x->buf);
 }
 
-// replaces closing parenthesis with null terminator and returns pointer
-// to the first character after the opening parenthesis
+// returns pointer to first character after space and removes trailing newline
 char*
 serial_file_tag_get_param(char* line) {
-  char* start = NULL;
-  for (char* i = line; *i != '\0'; i++) {
-    if (*i == '(') {
-      start = i + 1;
-    } else if (*i == ')') {
-      *i = '\0';
+  char* start = line;
+  while (true) {
+    if (*start == '\0') return start;
+    else if (*start == ' ') {
+      start++;
+      break;
     }
+    start++;
   }
+  while (*start == ' ') {
+    start++;
+  }
+
+  char* end = start;
+  while (*end != '\n' && *end != '\0') {
+    end++;
+  }
+  *end = '\0';
+
   return start;
 }
 
@@ -49,7 +59,7 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
 
     if (fgets(line, LINE_BUF_SIZE, file) == NULL) break;
 
-    if (strncmp(line, "ENDIAN_MIRROR_TAG_START(", 24) == 0) {
+    if (strncmp(line, "#mir_tag_start", 14) == 0) {
       char* str = serial_file_tag_get_param(line);
       tag_id = malloc(strlen(str) + 1);
       strcpy(tag_id, str);
@@ -66,9 +76,9 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
       if (fgets(line, LINE_BUF_SIZE, file) == NULL) {
         log_warn(MOD_STACK_FMT "end of file before end of tag", MOD_STACK_ARG);
         break;
-      } else if (strncmp(line, "ENDIAN_MIRROR_TAG_END()", 23) == 0) {
+      } else if (strncmp(line, "#mir_tag_end", 12) == 0) {
         break;
-      } else if (strncmp(line, "ENDIAN_MIRROR_TAG_DATA(", 23) == 0) {
+      } else if (strncmp(line, "#mir_tag_data", 13) == 0) {
         const char* str = serial_file_tag_get_param(line);
         if (data != NULL) {
           log_warn(MOD_STACK_FMT "overriding previous tag data", MOD_STACK_ARG);
