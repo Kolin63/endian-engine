@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+git submodule update submodules/concord
+
+cd submodules/concord && make && cd ../.. && \
+cp submodules/concord/lib/libdiscord.a lib

@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 4.4.2)
 
-find_package(CURL REQUIRED)
-
 add_library(concord STATIC IMPORTED)
 
 set_target_properties(concord PROPERTIES
@@ -20,7 +18,7 @@ file(GLOB REFLECTOR_SRC "mir/*.c" "dependencies/*.c" "src/fileio.c")
 add_executable(reflector ${REFLECTOR_SRC})
 add_compile_definitions(END_REF_INSTANCE="${END_INSTANCE}" END_REF_SRC_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-target_link_libraries(reflector PRIVATE concord CURL::libcurl)
+target_link_libraries(reflector PRIVATE concord)
 
 target_include_directories(reflector PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
@@ -33,6 +31,8 @@ set_target_properties(reflector PROPERTIES
 
 
 project(server C)
+
+find_package(CURL REQUIRED)
 
 add_custom_target(
   reflections ALL ${CMAKE_CURRENT_SOURCE_DIR}/reflector

@@ -1,2 +1,3 @@
 # lib
-This is where `libdiscord.a` should go
+This is where `libdiscord.a`. Run the `configure` script in the root directory
+to generate it.

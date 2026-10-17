@@ -1,0 +1,3 @@
+[submodule "submodules/concord"]
+	path = submodules/concord
+	url = https://github.com/cogmasters/concord

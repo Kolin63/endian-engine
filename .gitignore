@@ -17,3 +17,9 @@
 !mir/*.h
 !mir/mirrors
 !mir/mirrors/*.json
+
+!submodules
+!submodules/concord
+!submodules/curl
+!.gitmodules
+!configure
