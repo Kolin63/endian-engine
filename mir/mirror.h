@@ -11,7 +11,7 @@
 
 enum mirror_format_token_type {
   MIR_CONST,
-  MIR_FOREACH_BEGIN, // the tag for the block is stored in buf
+  MIR_FOREACH_BEGIN,  // the tag for the block is stored in buf
   MIR_FOREACH_END,
   MIR_TAG_CONTENT,   // %t
   MIR_DATA,          // %d

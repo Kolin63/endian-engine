@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct fid fid_split(char* str) {
+struct fid
+fid_split(char* str) {
   char* colon = str;
   while (*colon != ':' && *colon != '\0') colon++;
 
@@ -14,7 +15,8 @@ struct fid fid_split(char* str) {
   return (struct fid){.ns = str, .id = colon + 1};
 }
 
-char* fid_to_json(const struct fid* fid) {
+char*
+fid_to_json(const struct fid* fid) {
   // 7      x  8       x  2
   // {"ns":"...","id":"..."}
   char* str = malloc(7 + strlen(fid->ns) + 8 + strlen(fid->id) + 2 + 1);

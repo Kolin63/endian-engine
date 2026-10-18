@@ -55,11 +55,11 @@ command_create(const struct command* cmd, const struct discord_ready* event) {
   struct discord_application_command_options* discord_opts = command_options_end_to_conc(&cmd->options);
 
   struct discord_create_global_application_command discord_params = {
-      .type = cmd->type,
-      .name = (char*)cmd->name,
-      .description = (char*)cmd->description,
-      .options = discord_opts,
-      .default_member_permissions = cmd->default_member_permissions};
+    .type = cmd->type,
+    .name = (char*)cmd->name,
+    .description = (char*)cmd->description,
+    .options = discord_opts,
+    .default_member_permissions = cmd->default_member_permissions};
 
   discord_create_global_application_command(bot_get_global()->discord_bot, event->application->id, &discord_params, NULL);
   discord_application_command_options_cleanup(discord_opts);

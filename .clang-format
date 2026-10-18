@@ -9,3 +9,4 @@ SortIncludes:
   Enabled: False
 AllowShortEnumsOnASingleLine: True
 BreakAfterReturnType: AllDefinitions
+BracedInitializerIndentWidth: 2

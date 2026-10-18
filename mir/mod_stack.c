@@ -1,9 +1,9 @@
 #include "mod_stack.h"
 
 static struct mod_stack mod_stack = {
-    .mod = "",
-    .ns = "",
-    .file = "",
+  .mod = "",
+  .ns = "",
+  .file = "",
 };
 
 struct mod_stack*
