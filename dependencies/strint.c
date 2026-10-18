@@ -26,6 +26,32 @@
 #define STRINT_MIN_I64 -9223372036854775808ull
 #define STRINT_MAX_I64  9223372036854775807ll
 
+#define STRINT_TEN_POW_TABLE ((const uint64_t[]){ \
+  [0] =  1, \
+  [1] =  10, \
+  [2] =  100, \
+  [3] =  1000, \
+  [4] =  10000, \
+  [5] =  100000, \
+  [6] =  1000000, \
+  [7] =  10000000, \
+  [8] =  100000000, \
+  [9] =  1000000000, \
+  [10] = 10000000000, \
+  [11] = 100000000000, \
+  [12] = 1000000000000, \
+  [13] = 10000000000000, \
+  [14] = 100000000000000, \
+  [15] = 1000000000000000, \
+  [16] = 10000000000000000, \
+  [17] = 100000000000000000, \
+  [18] = 1000000000000000000, \
+  [19] = 10000000000000000000ULL, \
+})
+
+#define STRINT_TEN_POW(exponent) \
+  ((exponent > 19) * 0 + (exponent <= 19) * STRINT_TEN_POW_TABLE[exponent])
+
 static inline void
 strint_err_set(int* err, int val) {
   if (err != NULL) *err = val;
@@ -160,33 +186,6 @@ str_to_i64(const char* str, int* err) {
   return generic_str_to_signed(str, err, STRINT_MIN_I64, STRINT_MAX_I64);
 }
 
-static inline uint64_t
-ten_pow(unsigned int exponent) {
-  switch (exponent) {
-  case 0:  return 1;
-  case 1:  return 10;
-  case 2:  return 100;
-  case 3:  return 1000;
-  case 4:  return 10000;
-  case 5:  return 100000;
-  case 6:  return 1000000;
-  case 7:  return 10000000;
-  case 8:  return 100000000;
-  case 9:  return 1000000000;
-  case 10: return 10000000000;
-  case 11: return 100000000000;
-  case 12: return 1000000000000;
-  case 13: return 10000000000000;
-  case 14: return 100000000000000;
-  case 15: return 1000000000000000;
-  case 16: return 10000000000000000;
-  case 17: return 100000000000000000;
-  case 18: return 1000000000000000000;
-  case 19: return 10000000000000000000ULL;
-  default: return 0;
-  }
-}
-
 static inline char
 digit_to_char(unsigned int digit) {
   assert(digit >= 0 && digit <= 9);
@@ -211,15 +210,15 @@ generic_unsigned_to_str(char* buf, uint64_t x, int* err, int first_exp) {
   char* next_digit = buf;
 
   for (int exp = first_exp; exp >= 0; exp--) {
-    if (next_digit == buf && x < ten_pow(exp)) continue;
+    if (next_digit == buf && x < STRINT_TEN_POW(exp)) continue;
 
-    int digit = x / ten_pow(exp);
+    int digit = x / STRINT_TEN_POW(exp);
     assert(digit >= 0 && digit <= 9);
 
     *next_digit = digit_to_char(digit);
     next_digit++;
 
-    x -= digit * ten_pow(exp);
+    x -= digit * STRINT_TEN_POW(exp);
   }
 
   *next_digit = '\0';
