@@ -4,3 +4,10 @@ git submodule update submodules/concord
 
 cd submodules/concord && make && cd ../.. && \
 cp submodules/concord/lib/libdiscord.a lib
+
+if [[ ! -d include/concord ]]; then
+  mkdir include/concord
+fi
+
+cp submodules/concord/include/*.h submodules/concord/core/*.h \
+   submodules/concord/gencodecs/*.h include/concord
