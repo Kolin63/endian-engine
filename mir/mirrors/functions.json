@@ -26,6 +26,7 @@
         {
           "tag": "function_init",
           "format": [
+            "// %B",
             "void",
             "function_call_init_%m_%d() {",
             "%t",
@@ -36,6 +37,7 @@
         {
           "tag": "function_load",
           "format": [
+            "// %B",
             "void",
             "function_call_load_%m_%d() {",
             "%t",
@@ -46,6 +48,7 @@
         {
           "tag": "function_save",
           "format": [
+            "// %B",
             "void",
             "function_call_save_%m_%d() {",
             "%t",
@@ -56,6 +59,7 @@
         {
           "tag": "function_cleanup",
           "format": [
+            "// %B",
             "void",
             "function_call_cleanup_%m_%d() {",
             "%t",
@@ -68,7 +72,7 @@
         {
           "tag": "function_init",
           "format": [
-            "function_call_init_%m_%d();"
+            "function_call_init_%m_%d();  // %B"
           ]
         },
         "}",
@@ -78,7 +82,7 @@
         {
           "tag": "function_load",
           "format": [
-            "function_call_load_%m_%d();"
+            "function_call_load_%m_%d();  // %B"
           ]
         },
         "}",
@@ -88,7 +92,7 @@
         {
           "tag": "function_save",
           "format": [
-            "function_call_save_%m_%d();"
+            "function_call_save_%m_%d();  // %B"
           ]
         },
         "}",
@@ -98,7 +102,7 @@
         {
           "tag": "function_cleanup",
           "format": [
-            "function_call_cleanup_%m_%d();"
+            "function_call_cleanup_%m_%d();  // %B"
           ]
         },
         "}"

@@ -21,6 +21,7 @@ enum mirror_format_token_type {
   MIR_NS,            // %n
   MIR_NS_CAPS,       // %N
   MIR_ALPHA_SWITCH,  // %A
+  MIR_BLAME,         // %B
 };
 
 struct mirror_format_token {

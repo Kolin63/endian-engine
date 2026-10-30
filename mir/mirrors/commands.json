@@ -18,7 +18,7 @@
         {
           "tag": "command",
           "format": [
-            "  COMMAND_%D,"
+            "  COMMAND_%D,  // %B"
           ]
         },
         "};",
@@ -28,6 +28,7 @@
         {
           "tag": "command",
           "format": [
+            "// %B",
             "[COMMAND_%D] = %t,"
           ]
         },
@@ -36,6 +37,7 @@
         {
           "tag": "command_cb",
           "format": [
+            "// %B",
             "void %d_cb(struct discord* client, const struct discord_interaction* event);",
             ""
           ]
@@ -57,6 +59,7 @@
         {
           "tag": "command_cb",
           "format": [
+            "// %B",
             "void",
             "%d_cb(struct discord* client, const struct discord_interaction* event) {%t}"
           ]
@@ -81,7 +84,7 @@
         {
           "tag": "command_cb",
           "format": [
-            "  case COMMAND_%D: %d_cb(client, event); return;"
+            "  case COMMAND_%D: %d_cb(client, event); return;  // %B"
           ]
         },
         "  }",
@@ -92,7 +95,7 @@
         {
           "tag": "command",
           "format": [
-            "  command_create(&commands[COMMAND_%D], event);"
+            "  command_create(&commands[COMMAND_%D], event);  // %B"
           ]
         },
         "}"

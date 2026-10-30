@@ -34,7 +34,11 @@ mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line
     mirror_format_tokens_append(f, (struct mirror_format_token){
                                      .type = MIR_FOREACH_BEGIN,
                                      .buf = strdup("PREPROC")});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_CONST, .buf = strdup("// ")});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_BLAME});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_CONST, .buf = strdup("\n")});
     mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_TAG_CONTENT});
+    mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_CONST, .buf = strdup("\n")});
     mirror_format_tokens_append(f, (struct mirror_format_token){.type = MIR_FOREACH_END});
     return error;
   }
@@ -85,6 +89,9 @@ mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line
         break;
       case 'A':
         type = MIR_ALPHA_SWITCH;
+        break;
+      case 'B':
+        type = MIR_BLAME;
         break;
       default:
         log_error(MOD_STACK_FMT "unknown escape sequence %%%c", MOD_STACK_ARG, line[i]);

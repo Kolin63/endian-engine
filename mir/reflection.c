@@ -152,6 +152,26 @@ reflection_foreach_perfile_gen(struct reflection_out* ref, const struct mirror_f
     case MIR_ALPHA_SWITCH:
       ref->alpha.escapes_encountered++;
       break;
+
+    case MIR_BLAME:
+      {
+        const char* mod = mod_stack_global()->mod;
+        const char* ns = mod_stack_global()->ns;
+        const char* file = mod_stack_global()->file;
+        char* blame = malloc(strlen(mod) + 1 + strlen(ns) + 1 + strlen(file) + 1);
+        strcpy(blame, mod);
+        strcat(blame, ":");
+        strcat(blame, ns);
+        strcat(blame, ":");
+        strcat(blame, file);
+
+        if (ref->alpha.escapes_encountered > 0) {
+          alpha_switch_fillout(&ref->alpha, blame);
+        } else {
+          mirror_strings_append(buf, blame);
+        }
+        break;
+      }
     }
   }
 
@@ -163,6 +183,7 @@ reflection_foreach_gen(struct reflection_out* ref, const struct mirror_format_to
   int error = 0;
 
   for (size_t i = 0; i < sf->len; i++) {
+    mod_stack_global()->file = sf->arr[i].name;
     error += reflection_foreach_perfile_gen(ref, tokens, sf->arr + i);
   }
 
