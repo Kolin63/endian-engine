@@ -27,7 +27,7 @@
           "tag": "function_init",
           "format": [
             "// %B",
-            "void",
+            "static void",
             "function_call_init_%m_%d() {",
             "%t",
             "}",
@@ -38,7 +38,7 @@
           "tag": "function_load",
           "format": [
             "// %B",
-            "void",
+            "static void",
             "function_call_load_%m_%d() {",
             "%t",
             "}",
@@ -49,7 +49,7 @@
           "tag": "function_save",
           "format": [
             "// %B",
-            "void",
+            "static void",
             "function_call_save_%m_%d() {",
             "%t",
             "}",
@@ -60,7 +60,7 @@
           "tag": "function_cleanup",
           "format": [
             "// %B",
-            "void",
+            "static void",
             "function_call_cleanup_%m_%d() {",
             "%t",
             "}",
