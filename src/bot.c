@@ -77,7 +77,7 @@ bot_init() {
 
   char token[128];
   char* token_file_path = malloc(strlen(INSTANCE_DIR) + 10 + 1);
-  strcat(token_file_path, INSTANCE_DIR "/token.txt");
+  strcpy(token_file_path, INSTANCE_DIR "/token.txt");
 
   FILE* token_file = fopen(token_file_path, "r");
 
