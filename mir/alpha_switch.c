@@ -118,7 +118,6 @@ alpha_switch_gen_sub(struct mirror_strings* buf, const struct alpha_switch* alph
     int amt_new_matches_completed = 0;
 
     for (size_t match_i = 0; match_i < new_matches.len; match_i++) {
-      log_debug("c=%i; i=%zi; %zi/%zi: %s", c, i, match_i + 1, new_matches.len, alpha->cases.arr[new_matches.arr[match_i]].val);
       if (c == 0 && i == strlen(alpha->cases.arr[new_matches.arr[match_i]].val)) {
         alpha_switch_gen_copy_mirror_strings(buf, &alpha->cases.arr[new_matches.arr[0]].buf);
         amt_new_matches_completed++;
