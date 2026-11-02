@@ -88,7 +88,8 @@ alpha_switch_gen_sub(struct mirror_strings* buf, const struct alpha_switch* alph
   strcat(str, numstr);
   strcat(str, "]) {\n");
 
-  for (char c = 32; c < 127; c++) {
+  for (char c = 0; c < 127; c++) {
+    if (c > 0 && c < 32) continue;
     struct alpha_switch_matches new_matches = {};
     for (size_t match_i = 0; match_i < matches->len; match_i++) {
       if (alpha->cases.arr[matches->arr[match_i]].val[i] == c) {
@@ -97,15 +98,34 @@ alpha_switch_gen_sub(struct mirror_strings* buf, const struct alpha_switch* alph
     }
     if (new_matches.len == 0) continue;
 
-    mirror_strings_append(buf, malloc(6 + 1 + 4 + 1));
+    char char_str[4];
+    if (c == 0) {
+      char_str[0] = '\\';
+      char_str[1] = '\\';
+      char_str[2] = '0';
+      char_str[3] = '\0';
+    } else {
+      char_str[0] = c;
+      char_str[1] = '\0';
+    }
+
+    mirror_strings_append(buf, malloc(6 + 2 + 3 + 1));
     str = buf->arr[buf->len - 1];
     strcpy(str, "case '");
-    strcat(str, (char[]){c, '\0'});
+    strcat(str, char_str);
     strcat(str, "':\n\n");
 
-    if (new_matches.len == 1) {
-      alpha_switch_gen_copy_mirror_strings(buf, &alpha->cases.arr[new_matches.arr[0]].buf);
-    } else {
+    int amt_new_matches_completed = 0;
+
+    for (size_t match_i = 0; match_i < new_matches.len; match_i++) {
+      log_debug("c=%i; i=%zi; %zi/%zi: %s", c, i, match_i + 1, new_matches.len, alpha->cases.arr[new_matches.arr[match_i]].val);
+      if (c == 0 && i == strlen(alpha->cases.arr[new_matches.arr[match_i]].val)) {
+        alpha_switch_gen_copy_mirror_strings(buf, &alpha->cases.arr[new_matches.arr[0]].buf);
+        amt_new_matches_completed++;
+      }
+    }
+
+    if (amt_new_matches_completed != new_matches.len) {
       alpha_switch_gen_sub(buf, alpha, &new_matches, i + 1);
     }
 
