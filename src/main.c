@@ -10,7 +10,7 @@
 #include "regman.h"
 
 int
-main(int argc, const char** argv) {
+main() {
   struct sigaction sa = {0};
   sa.sa_handler = handle_sigint;
   sigaction(SIGINT, &sa, NULL);
