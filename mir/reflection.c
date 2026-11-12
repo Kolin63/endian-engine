@@ -38,10 +38,58 @@ reflection_out_cleanup(struct reflection_out* out) {
   mirror_strings_cleanup(&out->buf);
 }
 
+struct foreach_line_data {
+  bool in;
+  struct mirror_strings lines;
+  struct mirror_strings_arr buf;
+};
+
+static void
+foreach_line_gather_lines(struct foreach_line_data* foreach_line, const struct serial_file_tag* sf_tag_block) {
+  char* buf = strdup(sf_tag_block->buf);
+  char* line_start = buf;
+  for (char* ptr = buf; *line_start != '\0'; ptr++) {
+    if (*ptr == '\n') {
+      *ptr = '\0';
+      mirror_strings_append(&foreach_line->lines, strdup(line_start));
+      mirror_strings_arr_append(&foreach_line->buf, (struct mirror_strings){});
+      ptr++;
+      line_start = ptr;
+    }
+  }
+  free(buf);
+}
+
+static char*
+foreach_lines_gen(struct foreach_line_data* foreach_line) {
+  struct mirror_strings out = {};
+  for (size_t buf_i = 0; buf_i < foreach_line->buf.len; buf_i++) {
+    struct mirror_strings* line = foreach_line->buf.arr + buf_i;
+
+    for (size_t word_i = 0; word_i < line->len; word_i++) {
+      char** word = line->arr + word_i;
+      if (strcmp(*word, "%l") == 0) {
+        free(*word);
+        *word = strdup(foreach_line->lines.arr[buf_i]);
+      }
+    }
+
+    mirror_strings_append(line, strdup("\n"));
+
+    char* linecat = mirror_strings_cat(line);
+    mirror_strings_append(&out, linecat);
+  }
+
+  char* outcat = mirror_strings_cat(&out);
+  mirror_strings_cleanup(&out);
+  return outcat;
+}
+
 static int
 reflection_foreach_pertoken_gen(struct reflection_out* out,
                                 const struct mirror_format_token* token,
-                                const struct serial_file_tag* sf_tag_block) {
+                                const struct serial_file_tag* sf_tag_block,
+                                struct foreach_line_data* foreach_line) {
   int error = 0;
 
   char* line = NULL;
@@ -115,6 +163,40 @@ reflection_foreach_pertoken_gen(struct reflection_out* out,
     line = blame;
     break;
   }
+
+  case MIR_FOREACH_LINE_BEGIN:
+    if (foreach_line->in == true) {
+      log_error("Start of foreach line when already in a foreach line");
+      error++;
+      break;
+    }
+    foreach_line->in = true;
+    foreach_line->lines = (struct mirror_strings){};
+    foreach_line->buf = (struct mirror_strings_arr){};
+    foreach_line_gather_lines(foreach_line, sf_tag_block);
+    break;
+
+  case MIR_FOREACH_LINE_END:
+    if (foreach_line->in == false) {
+      log_error("End of foreach line when not in a foreach line");
+      error++;
+      break;
+    }
+    line = foreach_lines_gen(foreach_line);
+    foreach_line->in = false;
+    mirror_strings_cleanup(&foreach_line->lines);
+    mirror_strings_arr_cleanup(&foreach_line->buf);
+    break;
+
+  case MIR_FOREACH_LINE:
+    if (foreach_line->in == false) {
+      log_error("Use of foreach line when not in a foreach line");
+      error++;
+      break;
+    }
+    line = strdup("%l");
+    break;
+
   default:
     log_error("unknown token type");
     error++;
@@ -126,12 +208,19 @@ reflection_foreach_pertoken_gen(struct reflection_out* out,
   if (out->alpha.escapes_encountered > 0) {
     alpha_switch_fillout(&out->alpha, line);
     free(line);
+  } else if (foreach_line->in == true) {
+    for (size_t buf_i = 0; buf_i < foreach_line->buf.len; buf_i++) {
+      struct mirror_strings* buf = foreach_line->buf.arr + buf_i;
+      mirror_strings_append(buf, strdup(line));
+    }
+    free(line);
   } else {
     mirror_strings_append(&out->buf, line);
   }
 
   return error;
 }
+
 static int
 reflection_foreach_perfile_gen(struct reflection_out* out,
                                const struct mirror_format_tokens* tokens,
@@ -153,9 +242,11 @@ reflection_foreach_perfile_gen(struct reflection_out* out,
     }
   }
 
+  struct foreach_line_data foreach_line = {};
+
   for (size_t token_i = 0; token_i < tokens->len; token_i++) {
     const struct mirror_format_token* token = tokens->arr + token_i;
-    reflection_foreach_pertoken_gen(out, token, sf_tag_block);
+    reflection_foreach_pertoken_gen(out, token, sf_tag_block, &foreach_line);
   }
 
   return error;

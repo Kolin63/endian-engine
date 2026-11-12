@@ -9,6 +9,7 @@
 #include "json_macros.h"
 
 ENDVEC_DEFINE(mirror_strings, char*, char* str = arr->arr[i]; if (str != NULL) free(str));
+ENDVEC_DEFINE(mirror_strings_arr, struct mirror_strings, mirror_strings_cleanup(arr->arr + i));
 
 void
 mirror_strings_remove_backslashes(struct mirror_strings* arr) {
@@ -70,6 +71,29 @@ mirror_strings_from_json(struct mirror_strings* arr, const jsmntok_t* jsmn, cons
   }
 
   return error;
+}
+
+char*
+mirror_strings_cat(const struct mirror_strings* arr) {
+  if (arr == NULL || arr->arr == NULL) return NULL;
+
+  size_t size = 1;
+  size_t cap = 64 * arr->len;
+  char* buf = malloc(cap);
+  strcpy(buf, "");
+
+  for (size_t i = 0; i < arr->len; i++) {
+    if (arr->arr[i] == NULL) continue;
+    const char* line = arr->arr[i];
+    size += strlen(line);
+    if (size > cap) {
+      cap *= 2;
+      buf = realloc(buf, cap);
+    }
+    strcat(buf, line);
+  }
+
+  buf = realloc(buf, strlen(buf) + 1);
 }
 
 int

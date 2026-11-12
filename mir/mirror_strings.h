@@ -9,6 +9,7 @@
 #include "../src/endvec.h"
 
 ENDVEC_DECLARE(mirror_strings, char*);
+ENDVEC_DECLARE(mirror_strings_arr, struct mirror_strings);
 
 void mirror_strings_append_newline_to_all(struct mirror_strings* arr);
 void mirror_strings_cleanup(struct mirror_strings* arr);
@@ -17,6 +18,7 @@ int mirror_strings_from_json(struct mirror_strings* arr, const jsmntok_t* jsmn, 
 // a single backslash is removed
 // a double backslash is turned into one backslash
 void mirror_strings_remove_backslashes(struct mirror_strings* arr);
+char* mirror_strings_cat(const struct mirror_strings* arr);
 int mirror_strings_write(FILE* file, const struct mirror_strings* arr);
 
 #endif
