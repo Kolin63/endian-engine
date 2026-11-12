@@ -327,6 +327,7 @@ mirror_load_from_str(const char* str) {
 
   struct mirror m;
   if (mirror_from_json(&m, jsmn, str) != 0) {
+    mirror_cleanup(&m);
     free(jsmn);
     return;
   }
