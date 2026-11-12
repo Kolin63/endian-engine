@@ -45,17 +45,6 @@ struct mirror {
 
 ENDVEC_DECLARE(mirrors, struct mirror);
 
-void mirror_format_token_cleanup(struct mirror_format_token* f);
-
-void mirror_format_tokens_cleanup(struct mirror_format_tokens* f);
-int mirror_format_tokens_from_json(struct mirror_format_tokens* f, const jsmntok_t* jsmn, const char* json);
-
-void mirror_file_cleanup(struct mirror_file* f);
-int mirror_file_from_json(struct mirror_file* f, const jsmntok_t* jsmn, const char* json);
-
-void mirror_files_cleanup(struct mirror_files* arr);
-int mirror_files_from_json(struct mirror_files* arr, const jsmntok_t* jsmn, const char* json);
-
 void mirror_cleanup(struct mirror* m);
 int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json);
 void mirror_load(const char* file_path);
