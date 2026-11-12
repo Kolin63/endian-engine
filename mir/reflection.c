@@ -12,9 +12,11 @@
 #include "../src/fileio.h"
 #include "alpha_switch.h"
 
+static void reflection_out_cleanup(struct reflection_out* ref);
+
 ENDVEC_DEFINE(reflection_outs, struct reflection_out, reflection_out_cleanup(arr->arr + i));
 
-char*
+static char*
 strcaps(const char* in) {
   size_t len = strlen(in);
   char* buf = malloc(len + 1);
@@ -30,14 +32,16 @@ strcaps(const char* in) {
   return buf;
 }
 
-void
+static void
 reflection_out_cleanup(struct reflection_out* ref) {
   if (ref == NULL) return;
   mirror_strings_cleanup(&ref->buf);
 }
 
-int
-reflection_foreach_perfile_gen(struct reflection_out* ref, const struct mirror_format_tokens* tokens, const struct serial_file* sf) {
+static int
+reflection_foreach_perfile_gen(struct reflection_out* ref,
+                               const struct mirror_format_tokens* tokens,
+                               const struct serial_file* sf) {
   int error = 0;
 
   const char* tag = tokens->arr[-1].buf;
@@ -153,33 +157,34 @@ reflection_foreach_perfile_gen(struct reflection_out* ref, const struct mirror_f
       ref->alpha.escapes_encountered++;
       break;
 
-    case MIR_BLAME:
-      {
-        const char* mod = mod_stack_global()->mod;
-        const char* ns = mod_stack_global()->ns;
-        const char* file = mod_stack_global()->file;
-        char* blame = malloc(strlen(mod) + 1 + strlen(ns) + 1 + strlen(file) + 1);
-        strcpy(blame, mod);
-        strcat(blame, ":");
-        strcat(blame, ns);
-        strcat(blame, ":");
-        strcat(blame, file);
+    case MIR_BLAME: {
+      const char* mod = mod_stack_global()->mod;
+      const char* ns = mod_stack_global()->ns;
+      const char* file = mod_stack_global()->file;
+      char* blame = malloc(strlen(mod) + 1 + strlen(ns) + 1 + strlen(file) + 1);
+      strcpy(blame, mod);
+      strcat(blame, ":");
+      strcat(blame, ns);
+      strcat(blame, ":");
+      strcat(blame, file);
 
-        if (ref->alpha.escapes_encountered > 0) {
-          alpha_switch_fillout(&ref->alpha, blame);
-        } else {
-          mirror_strings_append(buf, blame);
-        }
-        break;
+      if (ref->alpha.escapes_encountered > 0) {
+        alpha_switch_fillout(&ref->alpha, blame);
+      } else {
+        mirror_strings_append(buf, blame);
       }
+      break;
+    }
     }
   }
 
   return error;
 }
 
-int
-reflection_foreach_gen(struct reflection_out* ref, const struct mirror_format_tokens* tokens, const struct serial_files* sf) {
+static int
+reflection_foreach_gen(struct reflection_out* ref,
+                       const struct mirror_format_tokens* tokens,
+                       const struct serial_files* sf) {
   int error = 0;
 
   for (size_t i = 0; i < sf->len; i++) {
@@ -190,7 +195,7 @@ reflection_foreach_gen(struct reflection_out* ref, const struct mirror_format_to
   return error;
 }
 
-int
+static int
 reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
   int error = 0;
 
@@ -233,7 +238,7 @@ reflection_out_gen(struct reflection_out* ref, const struct serial_files* sf) {
   return error;
 }
 
-int
+static int
 reflection_out_write(const struct reflection_out* ref) {
   int error = 0;
 
@@ -260,7 +265,18 @@ reflection_out_write(const struct reflection_out* ref) {
   return error;
 }
 
-int
+static int
+reflection_outs_write(const struct reflection_outs* ref) {
+  int error = 0;
+
+  for (size_t i = 0; i < ref->len; i++) {
+    error += reflection_out_write(ref->arr + i);
+  }
+
+  return error;
+}
+
+static int
 reflection_outs_gen(struct reflection_outs* ref, const struct serial_files* sf) {
   int error = 0;
 
@@ -269,17 +285,6 @@ reflection_outs_gen(struct reflection_outs* ref, const struct serial_files* sf) 
   }
 
   error += reflection_outs_write(ref);
-
-  return error;
-}
-
-int
-reflection_outs_write(const struct reflection_outs* ref) {
-  int error = 0;
-
-  for (size_t i = 0; i < ref->len; i++) {
-    error += reflection_out_write(ref->arr + i);
-  }
 
   return error;
 }
