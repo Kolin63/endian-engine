@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "log.h"
 #include "mod_stack.h"
@@ -18,6 +19,10 @@
     char* fullpath = malloc(strlen(pre_path) + 1 + strlen(path) + 1); \
     strcpy(fullpath, pre_path);                                       \
     strcat(fullpath, "/" path);                                       \
+    if (fileio_ensure_dir_exists(fullpath) != 0) {                    \
+      log_error("Could not make directory %s", fullpath);             \
+      assert(false);                                                  \
+    }                                                                 \
     dir_load(fullpath, func);                                         \
     free(fullpath);                                                   \
   }
@@ -96,6 +101,11 @@ mod_loader_load_mods() {
   log_info("Loading mods!");
 
   char* instance_dir = instance_dir_expand();
+
+  if (fileio_ensure_dir_exists(END_REF_INSTANCE) != 0) {
+    log_error("Could not make instance dir");
+    return;
+  }
 
   instance_dir_write(instance_dir);
 

@@ -57,10 +57,16 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
   char* path = malloc(strlen(INSTANCE_DIR) + 1 +
                       strlen(predir) + 1 + strlen(ns) + 1 + strlen(dir) + 1 +
                       strlen(file) + 1 + strlen(ext) + 1);
+
   strcpy(path, INSTANCE_DIR "/");
+  fileio_ensure_dir_exists(path);
+
   strcat(path, predir);
+  fileio_ensure_dir_exists(path);
+
   strcat(path, "/");
   strcat(path, ns);
+  fileio_ensure_dir_exists(path);
 
   // check that the namespace directory exists
   FILE* dir_check = fopen(path, "r");

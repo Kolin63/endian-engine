@@ -13,6 +13,7 @@
 #include "log.h"
 #include "function.h"
 #include "endapi/ref/instance_dir.h"
+#include "fileio.h"
 
 static struct bot* global_bot = NULL;
 
@@ -102,6 +103,11 @@ bot_init() {
   global_bot->discord_bot = discord_init(token);
 
   free(token_file_path);
+
+  if (fileio_ensure_dir_exists(INSTANCE_DIR "/logs") != 0) {
+    log_error("Could not make /logs directory");
+    abort_cleanup(EXIT_FAILURE);
+  }
 
   // open logging files
   char log_time_name[128];

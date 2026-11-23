@@ -6,6 +6,8 @@
 
 #include <log.h>
 
+#include "../src/fileio.h"
+
 int
 instance_dir_write(const char* instance_dir) {
   FILE* file = fopen(END_REF_SRC_DIR "/ref/instance_dir.h", "w");
@@ -65,12 +67,15 @@ instance_dir_expand() {
     instance_dir = malloc(strlen(home) + 21 + strlen(buf) + 1);
     strcpy(instance_dir, home);
     strcat(instance_dir, "/.local/share/endian/");
+    fileio_ensure_dir_exists(instance_dir);
 #else
     static_assert(false, "Default root not supported on this OS");
 #endif
     strcat(instance_dir, buf);
     free(buf);
   }
+
+  fileio_ensure_dir_exists(instance_dir);
 
   return instance_dir;
 }
