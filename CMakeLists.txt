@@ -32,6 +32,10 @@ set_target_properties(reflector PROPERTIES
 
 project(server C)
 
+if (NOT END_PORT)
+  set(END_PORT 63036)
+endif()
+
 find_package(CURL REQUIRED)
 
 add_custom_target(
@@ -44,7 +48,7 @@ file(GLOB SERVER_SRC "src/*.c" "dependencies/*.c" "ref/*.c" "ref/include/*/*.c")
 
 add_executable(server ${SERVER_SRC})
 add_dependencies(server reflections)
-add_compile_definitions(ENDIAN_ENGINE)
+add_compile_definitions(ENDIAN_ENGINE ENDIAN_TERMINAL_PORT="${END_PORT}")
 
 target_link_libraries(server PRIVATE concord CURL::libcurl)
 
@@ -54,6 +58,22 @@ target_include_directories(server PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/ref/include")
 
 set_target_properties(server PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED ON
+)
+
+
+project(terminal C)
+
+file(GLOB TERMINAL_SRC "term/*.c" "dependencies/*.c")
+
+add_executable(terminal ${TERMINAL_SRC})
+
+target_include_directories(terminal PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/dependencies"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+set_target_properties(terminal PROPERTIES
   C_STANDARD 23
   C_STANDARD_REQUIRED ON
 )
