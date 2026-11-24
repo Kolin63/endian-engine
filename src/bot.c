@@ -74,6 +74,12 @@ bot_init() {
     log_error("Global Bot already initialized");
     return;
   }
+
+  if (fileio_ensure_dir_exists(INSTANCE_DIR) != 0) {
+    log_error("Could not open instance directory %s", INSTANCE_DIR);
+    abort_cleanup(EXIT_FAILURE);
+  }
+
   global_bot = malloc(sizeof(struct bot));
 
   char token[128];
