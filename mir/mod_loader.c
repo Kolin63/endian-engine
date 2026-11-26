@@ -88,12 +88,11 @@ mod_loader_load_mods() {
   static_assert(false, "src dir is not defined!!! it's cmake's fault, not yours");
 #endif
 
-  if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") +
-          fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include") +
-          fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/ref") +
-          fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi") +
-          fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi/ref") !=
-      0) {
+  if (fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref") != 0 ||
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include") != 0 ||
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/ref") != 0 ||
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi") != 0 ||
+      fileio_ensure_dir_exists(END_REF_SRC_DIR "/ref/include/endapi/ref") != 0) {
     log_error("Could not make hardlink directories");
     return;
   }
