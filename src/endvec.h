@@ -35,4 +35,31 @@
     return arr->arr + arr->len - 1;                                               \
   }
 
+#define ENDVEC_STATIC(name, type, ...)                                            \
+  struct name {                                                                   \
+    type* arr;                                                                    \
+    size_t len;                                                                   \
+    size_t cap;                                                                   \
+  };                                                                              \
+                                                                                  \
+  static void name##_cleanup(struct name* arr) {                                  \
+    if (arr == NULL || arr->arr == NULL)                                          \
+      return;                                                                     \
+    for (size_t i = 0; i < arr->len; i++) {                                       \
+      __VA_ARGS__;                                                                \
+    }                                                                             \
+    free(arr->arr);                                                               \
+    arr->arr = NULL;                                                              \
+    arr->len = 0;                                                                 \
+    arr->cap = 0;                                                                 \
+  }                                                                               \
+                                                                                  \
+  static type* name##_append(struct name* arr, type val) {                        \
+    arr->len++;                                                                   \
+    arr->cap = arr->cap + (arr->len > arr->cap) * arr->cap + (arr->cap == 0) * 1; \
+    arr->arr = realloc(arr->arr, arr->cap * sizeof(type));                        \
+    arr->arr[arr->len - 1] = val;                                                 \
+    return arr->arr + arr->len - 1;                                               \
+  }
+
 #endif
