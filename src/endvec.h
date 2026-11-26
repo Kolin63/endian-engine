@@ -12,7 +12,7 @@
   };                                     \
                                          \
   void name##_cleanup(struct name* arr); \
-  void name##_append(struct name* arr, type val);
+  type* name##_append(struct name* arr, type val);
 
 #define ENDVEC_DEFINE(name, type, ...)                                            \
   void name##_cleanup(struct name* arr) {                                         \
@@ -27,11 +27,12 @@
     arr->cap = 0;                                                                 \
   }                                                                               \
                                                                                   \
-  void name##_append(struct name* arr, type val) {                                \
+  type* name##_append(struct name* arr, type val) {                               \
     arr->len++;                                                                   \
     arr->cap = arr->cap + (arr->len > arr->cap) * arr->cap + (arr->cap == 0) * 1; \
     arr->arr = realloc(arr->arr, arr->cap * sizeof(type));                        \
     arr->arr[arr->len - 1] = val;                                                 \
+    return arr->arr + arr->len - 1;                                               \
   }
 
 #endif

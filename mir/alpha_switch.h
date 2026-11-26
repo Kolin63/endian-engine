@@ -23,12 +23,7 @@ struct alpha_switch {
   char* const* buf;
 };
 
-void alpha_switch_matches_append(struct alpha_switch_matches* arr, size_t x);
-void alpha_switch_matches_cleanup(struct alpha_switch_matches* arr);
-
 void alpha_switch_case_cleanup(struct alpha_switch_case* alpha);
-
-void alpha_switch_cases_cleanup(struct alpha_switch_cases* alpha);
 
 void alpha_switch_cleanup(struct alpha_switch* alpha);
 void alpha_switch_fillout(struct alpha_switch* alpha, const char* buf);
