@@ -16,6 +16,7 @@ struct serial_file_tag {
 ENDVEC_DECLARE(serial_file_tags, struct serial_file_tag);
 
 struct serial_file {
+  char* mod;
   char* ns;
   char* name;
   struct serial_file_tags tags;
@@ -29,7 +30,7 @@ void serial_file_tags_cleanup(struct serial_file_tags* x);
 int serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file);
 
 void serial_file_cleanup(struct serial_file* x);
-int serial_file_load(struct serial_file* s, const char* ns, const char* file_path, const char* file_name);
+int serial_file_load(struct serial_file* s, const char* mod, const char* ns, const char* file_path, const char* file_name);
 
 void serial_files_cleanup(struct serial_files* x);
 

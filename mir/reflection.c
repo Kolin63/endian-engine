@@ -88,6 +88,7 @@ foreach_lines_gen(struct foreach_line_data* foreach_line) {
 static int
 reflection_foreach_pertoken_gen(struct reflection_out* out,
                                 const struct mirror_format_token* token,
+                                const struct serial_file* sf,
                                 const struct serial_file_tag* sf_tag_block,
                                 struct foreach_line_data* foreach_line) {
   int error = 0;
@@ -131,19 +132,19 @@ reflection_foreach_pertoken_gen(struct reflection_out* out,
     break;
 
   case MIR_MOD:
-    line = strdup(mod_stack_global()->mod);
+    line = strdup(sf->mod);
     break;
 
   case MIR_MOD_CAPS:
-    line = strcaps(mod_stack_global()->mod);
+    line = strcaps(sf->mod);
     break;
 
   case MIR_NS:
-    line = strdup(mod_stack_global()->ns);
+    line = strdup(sf->ns);
     break;
 
   case MIR_NS_CAPS:
-    line = strcaps(mod_stack_global()->ns);
+    line = strcaps(sf->ns);
     break;
 
   case MIR_ALPHA_SWITCH:
@@ -151,9 +152,9 @@ reflection_foreach_pertoken_gen(struct reflection_out* out,
     break;
 
   case MIR_BLAME: {
-    const char* mod = mod_stack_global()->mod;
-    const char* ns = mod_stack_global()->ns;
-    const char* file = mod_stack_global()->file;
+    const char* mod = sf->mod;
+    const char* ns = sf->ns;
+    const char* file = sf->name;
     char* blame = malloc(strlen(mod) + 1 + strlen(ns) + 1 + strlen(file) + 1);
     strcpy(blame, mod);
     strcat(blame, ":");
@@ -246,7 +247,7 @@ reflection_foreach_perfile_gen(struct reflection_out* out,
 
   for (size_t token_i = 0; token_i < tokens->len; token_i++) {
     const struct mirror_format_token* token = tokens->arr + token_i;
-    reflection_foreach_pertoken_gen(out, token, sf_tag_block, &foreach_line);
+    reflection_foreach_pertoken_gen(out, token, sf, sf_tag_block, &foreach_line);
   }
 
   return error;

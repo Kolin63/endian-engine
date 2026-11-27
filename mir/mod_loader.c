@@ -159,7 +159,7 @@ mirror_and_serial_files_reflect(struct mirror_and_serial_files_arr* mir_sf_arr) 
 static void
 mod_loader_mod_ns_data_dir_load(struct sflink_head* sfs, const char* file_path, const char* file_name) {
   struct serial_file sf = {};
-  int err = serial_file_load(&sf, mod_stack_global()->ns, file_path, file_name);
+  int err = serial_file_load(&sf, mod_stack_global()->mod, mod_stack_global()->ns, file_path, file_name);
 
   if (err != 0) {
     serial_file_cleanup(&sf);
@@ -183,7 +183,7 @@ mod_loader_mod_ns_data_load(struct mirror_and_serial_files_arr* mir_sf_arr, cons
 
 static void
 mod_loader_mod_ns_load(struct mirror_and_serial_files_arr* mir_sf_arr, const char* file_path) {
-  mod_dir_load(file_path, "", mod_stack_global()->file = file_name; mod_loader_mod_ns_data_load(mir_sf_arr, file_path, file_name));
+  mod_dir_load(file_path, "", mod_loader_mod_ns_data_load(mir_sf_arr, file_path, file_name));
 }
 
 static void

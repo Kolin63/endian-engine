@@ -116,7 +116,8 @@ serial_file_cleanup(struct serial_file* x) {
 }
 
 int
-serial_file_load(struct serial_file* s, const char* ns, const char* file_path, const char* file_name) {
+serial_file_load(struct serial_file* s, const char* mod, const char* ns, const char* file_path, const char* file_name) {
+  s->mod = NULL;
   s->ns = NULL;
   s->name = NULL;
   s->tags.arr = NULL;
@@ -125,6 +126,7 @@ serial_file_load(struct serial_file* s, const char* ns, const char* file_path, c
 
   if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return 1;
 
+  s->mod = strdup(mod);
   s->ns = strdup(ns);
   s->name = strdup(file_name);
 
