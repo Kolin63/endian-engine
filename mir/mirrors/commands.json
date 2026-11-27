@@ -54,7 +54,11 @@
       "format": [
         "#include \"commands.h\"",
         "",
+        "#include <pthread.h>",
+        "",
         "#include \"endapi/get_command_options.h\"",
+        "",
+        "static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;",
         "",
         {
           "tag": "command_cb",
@@ -80,14 +84,18 @@
         "",
         "void",
         "command_cb(enum command_id id, struct discord* client, const struct discord_interaction* event) {",
+        "  pthread_mutex_lock(&lock);",
+        "",
         "  switch (id) {",
         {
           "tag": "command_cb",
           "format": [
-            "  case COMMAND_%D: %d_cb(client, event); return;  // %B"
+            "  case COMMAND_%D: %d_cb(client, event); break;  // %B"
           ]
         },
         "  }",
+        "",
+        "  pthread_mutex_unlock(&lock);",
         "}",
         "",
         "void",
