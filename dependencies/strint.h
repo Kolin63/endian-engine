@@ -8,7 +8,6 @@ enum {
   STRINT_INVALID_CHAR = 1,
   STRINT_INT_OVERFLOW = 2,
   STRINT_NULL_STR = 3,
-  STRINT_NULL_BUF = 4,
 };
 
 // In string to integer functions, an invalid character will result in 0 being
@@ -34,13 +33,13 @@ int64_t  str_to_i64(const char* str, int* err);
 #define STRINT_32 16
 #define STRINT_64 32
 
-char* u8_to_str(char* buf, uint8_t x, int* err);
-char* i8_to_str(char* buf, int8_t x, int* err);
-char* u16_to_str(char* buf, uint16_t x, int* err);
-char* i16_to_str(char* buf, int16_t x, int* err);
-char* u32_to_str(char* buf, uint32_t x, int* err);
-char* i32_to_str(char* buf, int32_t x, int* err);
-char* u64_to_str(char* buf, uint64_t x, int* err);
-char* i64_to_str(char* buf, int64_t x, int* err);
+char* u8_to_str(char* buf, uint8_t x);
+char* i8_to_str(char* buf, int8_t x);
+char* u16_to_str(char* buf, uint16_t x);
+char* i16_to_str(char* buf, int16_t x);
+char* u32_to_str(char* buf, uint32_t x);
+char* i32_to_str(char* buf, int32_t x);
+char* u64_to_str(char* buf, uint64_t x);
+char* i64_to_str(char* buf, int64_t x);
 
 #endif

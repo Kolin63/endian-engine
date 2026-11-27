@@ -193,13 +193,8 @@ digit_to_char(unsigned int digit) {
 }
 
 static char*
-generic_unsigned_to_str(char* buf, uint64_t x, int* err, int first_exp) {
-  if (buf == NULL) {
-    strint_err_set(err, STRINT_NULL_BUF);
-    return NULL;
-  }
-
-  strint_err_set(err, STRINT_OK);
+generic_unsigned_to_str(char* buf, uint64_t x, int first_exp) {
+  if (buf == NULL) return NULL;
 
   if (x == 0) {
     buf[0] = '0';
@@ -227,11 +222,8 @@ generic_unsigned_to_str(char* buf, uint64_t x, int* err, int first_exp) {
 }
 
 static char*
-generic_signed_to_str(char* buf, int64_t x, int* err, int first_exp) {
-  if (buf == NULL) {
-    strint_err_set(err, STRINT_NULL_BUF);
-    return NULL;
-  }
+generic_signed_to_str(char* buf, int64_t x, int first_exp) {
+  if (buf == NULL) return NULL;
 
   char* new_buf;
   if (x < 0) {
@@ -242,46 +234,46 @@ generic_signed_to_str(char* buf, int64_t x, int* err, int first_exp) {
     new_buf = buf;
   }
 
-  generic_unsigned_to_str(new_buf, x, err, first_exp);
+  generic_unsigned_to_str(new_buf, x, first_exp);
   return buf;
 }
 
 char*
-u8_to_str(char* buf, uint8_t x, int* err) {
-  return generic_unsigned_to_str(buf, x, err, 2);
+u8_to_str(char* buf, uint8_t x) {
+  return generic_unsigned_to_str(buf, x, 2);
 }
 
 char*
-i8_to_str(char* buf, int8_t x, int* err) {
-  return generic_signed_to_str(buf, x, err, 2);
+i8_to_str(char* buf, int8_t x) {
+  return generic_signed_to_str(buf, x, 2);
 }
 
 char*
-u16_to_str(char* buf, uint16_t x, int* err) {
-  return generic_unsigned_to_str(buf, x, err, 4);
+u16_to_str(char* buf, uint16_t x) {
+  return generic_unsigned_to_str(buf, x, 4);
 }
 
 char*
-i16_to_str(char* buf, int16_t x, int* err) {
-  return generic_signed_to_str(buf, x, err, 4);
+i16_to_str(char* buf, int16_t x) {
+  return generic_signed_to_str(buf, x, 4);
 }
 
 char*
-u32_to_str(char* buf, uint32_t x, int* err) {
-  return generic_unsigned_to_str(buf, x, err, 9);
+u32_to_str(char* buf, uint32_t x) {
+  return generic_unsigned_to_str(buf, x, 9);
 }
 
 char*
-i32_to_str(char* buf, int32_t x, int* err) {
-  return generic_signed_to_str(buf, x, err, 9);
+i32_to_str(char* buf, int32_t x) {
+  return generic_signed_to_str(buf, x, 9);
 }
 
 char*
-u64_to_str(char* buf, uint64_t x, int* err) {
-  return generic_unsigned_to_str(buf, x, err, 19);
+u64_to_str(char* buf, uint64_t x) {
+  return generic_unsigned_to_str(buf, x, 19);
 }
 
 char*
-i64_to_str(char* buf, int64_t x, int* err) {
-  return generic_signed_to_str(buf, x, err, 19);
+i64_to_str(char* buf, int64_t x) {
+  return generic_signed_to_str(buf, x, 19);
 }
