@@ -65,3 +65,19 @@ command_create(const struct command* cmd, const struct discord_ready* event) {
   discord_application_command_options_cleanup(discord_opts);
   log_info("Loading command %s", cmd->name);
 }
+
+void
+command_basic_response(struct discord* client,
+                       const struct discord_interaction* event,
+                       bool ephemeral,
+                       const char* msg) {
+  struct discord_interaction_response params = {
+    .type = DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
+    .data = &(struct discord_interaction_callback_data){
+      .content = (char*)msg,
+      .flags = ephemeral ? DISCORD_MESSAGE_EPHEMERAL : 0,
+    },
+  };
+
+  discord_create_interaction_response(client, event->id, event->token, &params, NULL);
+}

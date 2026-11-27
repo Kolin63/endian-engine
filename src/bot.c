@@ -61,7 +61,11 @@ on_interaction(struct discord* client, const struct discord_interaction* event) 
 
   if (cmd_id == COMMAND_UNKNOWN_) {
     log_error("Could not find command %s", cmd_name);
-    // TODO: send error message to user via discord
+    char* buf = malloc(32 + strlen(cmd_name));
+    strcpy(buf, "Could not find command");
+    strcat(buf, cmd_name);
+    command_basic_response(client, event, true, buf);
+    free(buf);
     return;
   }
 
