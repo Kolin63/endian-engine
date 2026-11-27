@@ -80,7 +80,7 @@ user_init(unsigned long uuid) {
   avatar = realloc(avatar, strlen(avatar) + 1);
   user->avatar = avatar;
 
-  discord_cleanup(bot_get_global()->discord_bot);
+  discord_user_cleanup(&sync);
 
   user_init_status = USER_INIT_STATUS_IDLE;
 
