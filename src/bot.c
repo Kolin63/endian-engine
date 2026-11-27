@@ -110,6 +110,11 @@ bot_init() {
 
   free(token_file_path);
 
+  if (global_bot->discord_bot == NULL) {
+    log_error("Could not init Discord bot (is the token valid?)");
+    abort_cleanup(EXIT_FAILURE);
+  }
+
   if (fileio_ensure_dir_exists(INSTANCE_DIR "/logs") != 0) {
     log_error("Could not make /logs directory");
     abort_cleanup(EXIT_FAILURE);
