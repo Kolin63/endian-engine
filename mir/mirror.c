@@ -14,8 +14,6 @@
 #include "mod_stack.h"
 #include "../src/fileio.h"
 
-static struct mirrors global = {};
-
 static void mirror_format_token_cleanup(struct mirror_format_token* f);
 static void mirror_file_cleanup(struct mirror_file* f);
 
@@ -319,25 +317,26 @@ mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json) {
 }
 
 void
-mirror_load_from_str(const char* str) {
+mirror_load_from_str(struct mirror* mir, const char* str) {
+  mir->id = NULL;
+
   jsmntok_t* jsmn = fileio_read_json(str);
 
-  struct mirror m;
-  if (mirror_from_json(&m, jsmn, str) != 0) {
-    mirror_cleanup(&m);
+  if (mirror_from_json(mir, jsmn, str) != 0) {
+    mirror_cleanup(mir);
     free(jsmn);
     return;
   }
 
   free(jsmn);
 
-  mirrors_append(&global, m);
-
-  log_info("Loading mirror %s", m.id);
+  log_info("Loading mirror %s", mir->id);
 }
 
 void
-mirror_load(const char* file_path) {
+mirror_load(struct mirror* mir, const char* file_path) {
+  mir->id = NULL;
+
   if (strcmp(mod_stack_global()->file, "template.json") == 0) return;
 
   FILE* file = fopen(file_path, "r");
@@ -350,11 +349,6 @@ mirror_load(const char* file_path) {
   char* json = fileio_read_all(file);
   fclose(file);
 
-  mirror_load_from_str(json);
+  mirror_load_from_str(mir, json);
   free(json);
-}
-
-struct mirrors*
-mirrors_global() {
-  return &global;
 }

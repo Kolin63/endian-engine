@@ -50,10 +50,9 @@ ENDVEC_DECLARE(mirrors, struct mirror);
 
 void mirror_cleanup(struct mirror* m);
 int mirror_from_json(struct mirror* m, const jsmntok_t* jsmn, const char* json);
-void mirror_load(const char* file_path);
-void mirror_load_from_str(const char* str);
+void mirror_load(struct mirror* mir, const char* file_path);
+void mirror_load_from_str(struct mirror* mir, const char* str);
 
 void mirrors_cleanup(struct mirrors* arr);
-struct mirrors* mirrors_global();
 
 #endif

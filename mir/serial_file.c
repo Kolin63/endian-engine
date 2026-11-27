@@ -110,34 +110,38 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
 void
 serial_file_cleanup(struct serial_file* x) {
   if (x == NULL) return;
+  if (x->ns != NULL) free(x->ns);
   if (x->name != NULL) free(x->name);
   serial_file_tags_cleanup(&x->tags);
 }
 
-void
-serial_file_load(struct serial_file* s, const char* file_path, const char* file_name) {
+int
+serial_file_load(struct serial_file* s, const char* ns, const char* file_path, const char* file_name) {
+  s->ns = NULL;
   s->name = NULL;
   s->tags.arr = NULL;
   s->tags.len = 0;
   s->tags.cap = 0;
 
-  if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return;
+  if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return 1;
 
+  s->ns = strdup(ns);
   s->name = strdup(file_name);
 
   FILE* file = fopen(file_path, "r");
 
   if (!file) {
     log_error(MOD_STACK_FMT "Could not open file (%s)", MOD_STACK_ARG, file_path);
-    return;
+    return 1;
   }
 
   if (serial_file_tags_fillout(&s->tags, file) != 0) {
     log_error(MOD_STACK_FMT "could not parse file", MOD_STACK_ARG);
-    return;
+    return 1;
   }
 
   fclose(file);
 
   log_info("Serializing file %s", mod_stack_global()->file);
+  return 0;
 }
