@@ -236,10 +236,12 @@ mod_loader_load_mods() {
   struct mirror_and_serial_files_arr mir_sf_arr = {};
 
   mod_stack_global()->mod = "engine";
-  mod_stack_global()->file = END_REF_SRC_DIR "/mir/mirrors/functions.json";
+  mod_stack_global()->file = "functions.json";
   mirror_and_serial_files_load_mirror(&mir_sf_arr, END_REF_SRC_DIR "/mir/mirrors/functions.json");
-  mod_stack_global()->file = END_REF_SRC_DIR "/mir/mirrors/commands.json";
+  mod_stack_global()->file = "commands.json";
   mirror_and_serial_files_load_mirror(&mir_sf_arr, END_REF_SRC_DIR "/mir/mirrors/commands.json");
+  mod_stack_global()->file = "owners.json";
+  mirror_and_serial_files_load_mirror(&mir_sf_arr, END_REF_SRC_DIR "/mir/mirrors/owners.json");
 
   mod_dir_load(instance_dir, "mods", mod_stack_global()->mod = file_name; mod_loader_mod_load(&mir_sf_arr, file_path));
 

@@ -1,0 +1,24 @@
+{
+  "id": "owners",
+  "files": [
+    {
+      "name": "owners.ref.h",
+      "format": [
+        "#ifndef ENDIAN_OWNERS_REF_H_",
+        "#define ENDIAN_OWNERS_REF_H_",
+        "",
+        "static const unsigned long server_owners[] = {",
+        {
+          "tag": "owner",
+          "format": [
+            "%{  %l,  // %B%}"
+          ]
+        },
+        "  0,",
+        "};",
+        "",
+        "#endif"
+      ]
+    }
+  ]
+}

@@ -28,6 +28,7 @@ struct command {
   const char* description;
   const struct command_options options;
   const unsigned long default_member_permissions;
+  const bool owner_only;
 };
 
 enum command_id;

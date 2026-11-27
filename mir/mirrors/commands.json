@@ -49,6 +49,7 @@
         "#include <pthread.h>",
         "",
         "#include \"endapi/get_command_options.h\"",
+        "#include \"endapi/owners.h\"",
         "",
         "static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;",
         "",
@@ -67,7 +68,7 @@
           "format": [
             "%Astr",
             "%A%d",
-            "%Areturn COMMAND_%D;",
+            "%Areturn COMMAND_%D;  // %B",
             "%Areturn COMMAND_UNKNOWN_;",
             "%A"
           ]
@@ -88,7 +89,13 @@
         {
           "tag": "command_cb",
           "format": [
-            "  case COMMAND_%D: %d_cb(client, event); break;  // %B"
+            "  case COMMAND_%D:  // %B",
+            "    if (commands[id].owner_only && !is_owner(event->member->user->id)) {  // %B",
+            "      command_basic_response(client, event, true, \"You are not an owner!\");  // %B",
+            "      break;  // %B",
+            "    }  // %B",
+            "    %d_cb(client, event);  // %B",
+            "    break;  // %B"
           ]
         },
         "  default:",
