@@ -79,6 +79,7 @@ save_or_rom_read(const char* predir, const char* ns, const char* dir,
 
   strcat(path, "/");
   strcat(path, dir);
+  fileio_ensure_dir_exists(path);
 
   // check that the namespace/dir directory exists
   dir_check = fopen(path, "r");
