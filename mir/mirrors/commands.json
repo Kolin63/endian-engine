@@ -34,14 +34,6 @@
         },
         "};",
         "",
-        {
-          "tag": "command_cb",
-          "format": [
-            "// %B",
-            "void %d_cb(struct discord* client, const struct discord_interaction* event);",
-            ""
-          ]
-        },
         "#endif"
       ]
     },
@@ -64,7 +56,7 @@
           "tag": "command_cb",
           "format": [
             "// %B",
-            "void",
+            "static void",
             "%d_cb(struct discord* client, const struct discord_interaction* event) {%t}"
           ]
         },
