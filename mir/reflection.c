@@ -71,6 +71,9 @@ foreach_lines_gen(struct foreach_line_data* foreach_line) {
       if (strcmp(*word, "%l") == 0) {
         free(*word);
         *word = strdup(foreach_line->lines.arr[buf_i]);
+      } else if (strcmp(*word, "%L") == 0) {
+        free(*word);
+        *word = strcaps(foreach_line->lines.arr[buf_i]);
       }
     }
 
@@ -196,6 +199,15 @@ reflection_foreach_pertoken_gen(struct reflection_out* out,
       break;
     }
     line = strdup("%l");
+    break;
+
+  case MIR_FOREACH_LINE_CAPS:
+    if (foreach_line->in == false) {
+      log_error("Use of foreach line when not in a foreach line");
+      error++;
+      break;
+    }
+    line = strdup("%L");
     break;
 
   default:

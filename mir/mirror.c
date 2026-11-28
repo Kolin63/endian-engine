@@ -103,6 +103,9 @@ mirror_format_tokens_from_line(struct mirror_format_tokens* f, const char* _line
       case 'l':
         type = MIR_FOREACH_LINE;
         break;
+      case 'L':
+        type = MIR_FOREACH_LINE_CAPS;
+        break;
       default:
         log_error(MOD_STACK_FMT "unknown escape sequence %%%c", MOD_STACK_ARG, line[i]);
         error++;

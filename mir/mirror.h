@@ -25,6 +25,7 @@ enum mirror_format_token_type {
   MIR_FOREACH_LINE_BEGIN,  // %{
   MIR_FOREACH_LINE_END,    // %}
   MIR_FOREACH_LINE,        // %l
+  MIR_FOREACH_LINE_CAPS,   // %L
 };
 
 struct mirror_format_token {
