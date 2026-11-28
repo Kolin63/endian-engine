@@ -110,6 +110,7 @@ serial_file_tags_fillout(struct serial_file_tags* tags, FILE* file) {
 void
 serial_file_cleanup(struct serial_file* x) {
   if (x == NULL) return;
+  if (x->mod != NULL) free(x->mod);
   if (x->ns != NULL) free(x->ns);
   if (x->name != NULL) free(x->name);
   serial_file_tags_cleanup(&x->tags);
@@ -126,10 +127,6 @@ serial_file_load(struct serial_file* s, const char* mod, const char* ns, const c
 
   if (strncmp(mod_stack_global()->file, "template.", 9) == 0) return 1;
 
-  s->mod = strdup(mod);
-  s->ns = strdup(ns);
-  s->name = strdup(file_name);
-
   FILE* file = fopen(file_path, "r");
 
   if (!file) {
@@ -137,8 +134,15 @@ serial_file_load(struct serial_file* s, const char* mod, const char* ns, const c
     return 1;
   }
 
+  s->mod = strdup(mod);
+  s->ns = strdup(ns);
+  s->name = strdup(file_name);
+
   if (serial_file_tags_fillout(&s->tags, file) != 0) {
     log_error(MOD_STACK_FMT "could not parse file", MOD_STACK_ARG);
+    free(s->mod);
+    free(s->ns);
+    free(s->name);
     return 1;
   }
 
