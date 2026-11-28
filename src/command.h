@@ -40,6 +40,7 @@ void command_create(const struct command* cmd, const struct discord_ready* event
 void command_create_all(const struct discord_ready* event);
 enum command_id command_id_get(const char* str);
 void command_basic_response(struct discord* client, const struct discord_interaction* event, bool ephemeral, const char* msg);
+unsigned long command_event_get_uuid(const struct discord_interaction* event);
 
 #include "endapi/ref/commands.h"
 

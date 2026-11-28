@@ -90,7 +90,7 @@
           "tag": "command_cb",
           "format": [
             "  case COMMAND_%D:  // %B",
-            "    if (commands[id].owner_only && !is_owner(event->member->user->id)) {  // %B",
+            "    if (commands[id].owner_only && !is_owner(command_event_get_uuid(event))) {  // %B",
             "      command_basic_response(client, event, true, \"You are not an owner!\");  // %B",
             "      break;  // %B",
             "    }  // %B",

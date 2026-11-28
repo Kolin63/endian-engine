@@ -81,3 +81,8 @@ command_basic_response(struct discord* client,
 
   discord_create_interaction_response(client, event->id, event->token, &params, NULL);
 }
+
+unsigned long
+command_event_get_uuid(const struct discord_interaction* event) {
+  return event->member->user->id;
+}
